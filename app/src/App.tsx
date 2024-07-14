@@ -6,11 +6,11 @@ import {
   Routes,
 } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
-import { About } from "./pages/About";
-import { Blog } from "./pages/Blog";
-import { Contact } from "./pages/Contact";
+import About from "./pages/About";
+import Blog from "./pages/Blog";
+import Contact from "./pages/Contact";
 import Home from "./pages/Home";
-import { Projects } from "./pages/Projects";
+import Projects from "./pages/Projects";
 import Skills from "./pages/Skills";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
