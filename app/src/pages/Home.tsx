@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React, { useEffect, useRef, useState } from "react";
+import ProfilePic from "../assets/ProfilePicc.png";
 
 const LandingPage: React.FC = () => {
   const [input, setInput] = useState("");
@@ -165,7 +166,7 @@ const LandingPage: React.FC = () => {
             </p>
             <div className="mb-6">
               <img
-                src="https://via.placeholder.com/200"
+                src={ProfilePic}
                 alt="John Doe"
                 className="rounded-full w-48 h-48 object-cover border-4 border-white dark:border-gray-700"
               />
