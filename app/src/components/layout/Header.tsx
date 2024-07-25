@@ -5,10 +5,11 @@ import { ModeToggle } from "@/components/ui/mood-toggle";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -18,6 +19,14 @@ export const Header: React.FC = () => {
     { href: "/blog", label: "Blog" },
     { href: "/contact", label: "Contact" },
   ];
+
+  const getLinkClasses = (href: string) => {
+    const baseClasses =
+      "text-foreground hover:text-primary transition-colors relative";
+    const activeClasses =
+      "text-primary font-semibold after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:w-full after:h-[2px] after:bg-primary";
+    return `${baseClasses} ${location.pathname === href ? activeClasses : ""}`;
+  };
 
   return (
     <header className="flex justify-between items-center p-4 bg-background">
@@ -40,7 +49,7 @@ export const Header: React.FC = () => {
                 <Link
                   key={link.href}
                   to={link.href}
-                  className="text-foreground hover:text-primary transition-colors"
+                  className={getLinkClasses(link.href)}
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}
@@ -56,14 +65,24 @@ export const Header: React.FC = () => {
           <Link
             key={link.href}
             to={link.href}
-            className="text-foreground hover:text-primary transition-colors"
+            className={getLinkClasses(link.href)}
           >
             {link.label}
           </Link>
         ))}
       </nav>
 
-      <div>
+      <div className="flex items-center space-x-4">
+        {location.pathname !== "/" && (
+          <Button
+            className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+            asChild
+          >
+            <a href="/Tirdesh-Resume.pdf" download>
+              Download CV
+            </a>
+          </Button>
+        )}
         <ModeToggle />
       </div>
     </header>

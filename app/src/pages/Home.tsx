@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ProfilePic from "../assets/ProfilePicc.png";
 
 const LandingPage: React.FC = () => {
@@ -14,6 +15,7 @@ const LandingPage: React.FC = () => {
     { type: "bot", content: "Type 'help' to see available commands." },
   ]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -101,7 +103,17 @@ const LandingPage: React.FC = () => {
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
             Tirdesh Pettugani
           </h1>
-          <Button className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600">
+          <Button
+            className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+            onClick={() => {
+              const link = document.createElement("a");
+              link.href = "/Tirdesh-Resume.pdf";
+              link.download = "Tirdesh-Resume.pdf";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+          >
             Download CV
           </Button>
         </div>
@@ -173,10 +185,23 @@ const LandingPage: React.FC = () => {
               />
             </div>
             <div className="space-x-4">
-              <Button className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600">
+              <Button
+                className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = "/Tirdesh-Resume.pdf";
+                  link.download = "Tirdesh-Resume.pdf";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
                 Download CV
               </Button>
-              <Button className="bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+              <Button
+                className="bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                onClick={() => navigate("/contact")}
+              >
                 Contact Me
               </Button>
             </div>
