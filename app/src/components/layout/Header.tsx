@@ -1,3 +1,5 @@
+import logo from "@/assets/ncnl.jpeg";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mood-toggle";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -20,6 +22,12 @@ export const Header: React.FC = () => {
   return (
     <header className="flex justify-between items-center p-4 bg-background">
       <div className="flex items-center space-x-4 md:space-x-8">
+        <Link to="/" className="flex items-center space-x-2">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={logo} alt="NCNL Logo" />
+            <AvatarFallback>NCNL</AvatarFallback>
+          </Avatar>
+        </Link>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="outline" size="icon">
