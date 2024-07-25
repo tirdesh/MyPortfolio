@@ -1,97 +1,274 @@
 // src/pages/Skills.tsx
 
-import { Card, CardContent } from "@/components/ui/card";
 import { skillCategories } from "@/content/SkillList";
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import React, { useState } from "react";
+import {
+  ActiveElement,
+  ArcElement,
+  ChartEvent,
+  Chart as ChartJS,
+  Legend,
+  Tooltip,
+} from "chart.js";
+import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import { Pie } from "react-chartjs-2";
 
-const SkillCategory: React.FC<{ category: (typeof skillCategories)[0] }> = ({
-  category,
-}) => {
-  const [expanded, setExpanded] = useState(false);
-  const visibleSkills = expanded
-    ? category.skills
-    : category.skills.slice(0, 5);
-  const IconComponent = category.icon;
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+const BUBBLE_SIZE = 80;
+const BORDER_PADDING = 20;
+
+const getRandomPosition = (width: number, height: number) => ({
+  x:
+    Math.random() * (width - BUBBLE_SIZE - 2 * BORDER_PADDING) + BORDER_PADDING,
+  y:
+    Math.random() * (height - BUBBLE_SIZE - 2 * BORDER_PADDING) +
+    BORDER_PADDING,
+});
+
+const getRandomVelocity = () => ({
+  x: (Math.random() - 0.5) * 4,
+  y: (Math.random() - 0.5) * 4,
+});
+
+const MIN_BUBBLE_SIZE = 60;
+const MAX_BUBBLE_SIZE = 120;
+
+const SkillCategoryBubble: React.FC<{
+  category: (typeof skillCategories)[0];
+  onClick: () => void;
+  containerSize: { width: number; height: number };
+  maxSkillCount: number;
+}> = ({ category, onClick, containerSize, maxSkillCount }) => {
+  const controls = useAnimation();
+
+  // Calculate bubble size based on skill count
+  const skillCount = category.skills.length;
+  const bubbleSize =
+    MIN_BUBBLE_SIZE +
+    (MAX_BUBBLE_SIZE - MIN_BUBBLE_SIZE) * (skillCount / maxSkillCount);
+
+  const [position, setPosition] = useState(
+    getRandomPosition(containerSize.width, containerSize.height)
+  );
+  const [velocity, setVelocity] = useState(getRandomVelocity());
+
+  useEffect(() => {
+    const updatePosition = () => {
+      let newX = position.x + velocity.x;
+      let newY = position.y + velocity.y;
+      let newVelocityX = velocity.x;
+      let newVelocityY = velocity.y;
+
+      if (
+        newX <= BORDER_PADDING ||
+        newX >= containerSize.width - bubbleSize - BORDER_PADDING
+      ) {
+        newVelocityX = -newVelocityX;
+        newX = Math.max(
+          BORDER_PADDING,
+          Math.min(newX, containerSize.width - bubbleSize - BORDER_PADDING)
+        );
+      }
+      if (
+        newY <= BORDER_PADDING ||
+        newY >= containerSize.height - bubbleSize - BORDER_PADDING
+      ) {
+        newVelocityY = -newVelocityY;
+        newY = Math.max(
+          BORDER_PADDING,
+          Math.min(newY, containerSize.height - bubbleSize - BORDER_PADDING)
+        );
+      }
+
+      setPosition({ x: newX, y: newY });
+      setVelocity({ x: newVelocityX, y: newVelocityY });
+      controls.set({ x: newX, y: newY });
+    };
+
+    const interval = setInterval(updatePosition, 50);
+    return () => clearInterval(interval);
+  }, [position, velocity, controls, containerSize, bubbleSize]);
 
   return (
-    <Card className="h-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <CardContent className="p-6">
-        <div className="flex items-center mb-4">
-          <IconComponent className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mr-2" />
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
-            {category.category}
-          </h2>
-        </div>
-        <ul className="space-y-3">
-          <AnimatePresence>
-            {visibleSkills.map((skill, skillIndex) => (
-              <motion.li
-                key={skillIndex}
-                className="text-gray-700 dark:text-gray-300"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <span className="font-medium">{skill.name}</span>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {skill.trivia}
-                </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 italic">
-                  {skill.fact}
-                </p>
-              </motion.li>
-            ))}
-          </AnimatePresence>
-        </ul>
-        {category.skills.length > 5 && (
-          <button
-            className="mt-4 flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-200"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? (
-              <>
-                <ChevronUpIcon className="mr-1" /> View Less
-              </>
-            ) : (
-              <>
-                <ChevronDownIcon className="mr-1" /> View More
-              </>
-            )}
-          </button>
-        )}
-      </CardContent>
-    </Card>
+    <motion.div
+      className="absolute flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-white cursor-pointer"
+      style={{ width: bubbleSize, height: bubbleSize }}
+      animate={controls}
+      onClick={onClick}
+    >
+      <span className="text-center text-sm">{category.category}</span>
+    </motion.div>
   );
 };
 
 const Skills: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState<
+    (typeof skillCategories)[0] | null
+  >(null);
+  const [selectedSkill, setSelectedSkill] = useState<{
+    name: string;
+    trivia: string;
+    fact: string;
+  } | null>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (containerRef.current) {
+        setContainerSize({
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight,
+        });
+      }
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  const pieData = {
+    labels: selectedCategory?.skills.map((skill) => skill.name) || [],
+    datasets: [
+      {
+        data: selectedCategory?.skills.map(() => 1) || [],
+        backgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+          "#FF9F40",
+        ],
+        hoverBackgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+          "#FF9F40",
+        ],
+      },
+    ],
+  };
+
+  const pieOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: "right" as const,
+        labels: {
+          color: "white",
+          font: {
+            size: 14,
+          },
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: { dataIndex: number }) => {
+            const skill = selectedCategory?.skills[context.dataIndex];
+            return skill ? skill.name : "";
+          },
+        },
+      },
+    },
+    onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
+      if (elements.length > 0) {
+        const index = elements[0].index;
+        setSelectedSkill(selectedCategory?.skills[index] || null);
+      }
+    },
+  };
+  const maxSkillCount = Math.max(
+    ...skillCategories.map((category) => category.skills.length)
+  );
   return (
-    <div className="flex-grow flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-4 md:p-8 min-h-[calc(100vh-12rem)]">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-7xl mx-auto"
+    <div className="relative flex-grow flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black p-4 md:p-8 min-h-screen">
+      <h1 className="text-4xl font-bold text-gray-200 mb-8">My Skills</h1>
+      <div
+        ref={containerRef}
+        className="border-4 border-indigo-500 rounded-lg w-full h-[calc(100vh-120px)]"
       >
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
-          My Tech Arsenal
-        </h1>
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {skillCategories.map((category, index) => (
-            <motion.div
+        {!selectedCategory &&
+          skillCategories.map((category, index) => (
+            <SkillCategoryBubble
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <SkillCategory category={category} />
-            </motion.div>
+              category={category}
+              onClick={() => {
+                setSelectedCategory(category);
+                setSelectedSkill(null); // Close skill info if another category is clicked
+              }}
+              containerSize={containerSize}
+              maxSkillCount={maxSkillCount}
+            />
           ))}
-        </div>
-      </motion.div>
+        <AnimatePresence>
+          {selectedCategory && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <div className="relative w-full h-full max-w-3xl max-h-3xl p-8">
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="relative w-full h-full">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-[80%] h-[80%] relative">
+                        <div className="absolute top-3 left-0 right-12 text-white text-center font-semibold py-2 rounded-md shadow-lg">
+                          Click on a skill slice to learn more
+                        </div>
+                        <Pie data={pieData} options={pieOptions} />
+                        <button
+                          className="absolute top-2 right-2 text-white z-10 bg-red-500 rounded-full w-8 h-8 flex items-center justify-center"
+                          onClick={() => {
+                            setSelectedCategory(null);
+                            setSelectedSkill(null);
+                          }}
+                        >
+                          X
+                        </button>
+                        {selectedSkill && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="absolute inset-0 flex items-center justify-center"
+                          >
+                            <div className="relative bg-gray-800 rounded-full w-[45%] h-[45%] flex items-center justify-center p-4 border-2 border-indigo-300">
+                              <button
+                                className="absolute top-1 right-1 text-white z-10 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                                onClick={() => setSelectedSkill(null)}
+                              >
+                                X
+                              </button>
+                              <div className="text-center">
+                                <h3 className="text-lg font-bold text-white mb-2">
+                                  {selectedSkill.name}
+                                </h3>
+                                <p className="text-sm text-gray-300 mb-2">
+                                  {selectedSkill.trivia}
+                                </p>
+                                <p className="text-xs text-gray-400 italic">
+                                  {selectedSkill.fact}
+                                </p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
