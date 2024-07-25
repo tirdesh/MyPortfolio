@@ -19,11 +19,15 @@ export const Terminal = forwardRef<HTMLDivElement, TerminalProps>(
     return (
       <div
         ref={ref}
-        className="bg-black text-green-500 p-4 rounded-lg h-96 overflow-y-auto"
+        className="bg-black text-green-500 p-4 rounded-lg h-96 overflow-y-auto font-mono"
       >
-        {messages.map((msg, index) => (
-          <div key={index}>{msg}</div>
-        ))}
+        <div className="space-y-2">
+          {messages.map((msg, index) => (
+            <div key={index} className="whitespace-pre-wrap break-words">
+              {msg}
+            </div>
+          ))}
+        </div>
         <form onSubmit={handleSubmit} className="mt-4">
           <input
             type="text"
@@ -37,3 +41,5 @@ export const Terminal = forwardRef<HTMLDivElement, TerminalProps>(
     );
   }
 );
+
+Terminal.displayName = "Terminal";

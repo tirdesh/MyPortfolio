@@ -126,6 +126,7 @@ const LandingPage: React.FC = () => {
                         ? "bg-purple-500 text-white"
                         : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
                     }`}
+                    style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
                   >
                     {msg.content}
                   </span>
@@ -189,7 +190,10 @@ const LandingPage: React.FC = () => {
                   className="h-[400px] w-full rounded border border-gray-700 p-4 bg-black text-green-500"
                   ref={scrollAreaRef}
                 >
-                  <pre className="font-mono text-sm">
+                  <pre
+                    className="font-mono text-sm"
+                    style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                  >
                     {messages.map((msg, index) => (
                       <div
                         key={index}
