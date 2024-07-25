@@ -91,7 +91,8 @@ const projects: Project[] = [
     tech: ["MERN stack", "Artificial Intelligence"],
     github: "https://github.com/tirdesh/intellidiary",
     live: "https://intellidiary.example.com",
-    image: "/path/to/intellidiary-image.jpg",
+    image:
+      "https://raw.githubusercontent.com/tirdesh/MyPortfolio/main/app/src/assets/ncnl.jpeg",
     challenges:
       "Implementing natural language processing for sentiment analysis. Ensuring the accuracy of sentiment analysis across diverse user entries.",
     solutions:
@@ -132,7 +133,8 @@ const projects: Project[] = [
     tech: ["Python", "Artificial Intelligence"],
     github: "https://github.com/tirdesh/pybot",
     live: "https://indoornavigatingbot.example.com",
-    image: "https://raw.githubusercontent.com/tirdesh/PyBot/main/tank.png",
+    image:
+      "https://raw.githubusercontent.com/tirdesh/MyPortfolio/main/app/src/assets/ncnl.jpeg",
     challenges:
       "Optimizing pathfinding algorithms for indoor navigation. Reducing collisions with obstacles.",
     solutions:
@@ -145,7 +147,8 @@ const projects: Project[] = [
     tech: ["Python", "EasyGUI"],
     github: "https://github.com/tirdesh/bubank",
     live: "https://bubank.example.com",
-    image: "/path/to/bubank-image.jpg",
+    image:
+      "https://raw.githubusercontent.com/tirdesh/MyPortfolio/main/app/src/assets/ncnl.jpeg",
     challenges:
       "Ensuring secure and reliable data storage. Verifying customer identities through Aadhar card details and handling user authentication.",
     solutions:
@@ -158,7 +161,8 @@ const projects: Project[] = [
     tech: ["Python", "Machine Learning"],
     github: "https://github.com/tirdesh/sine",
     live: "https://sine.example.com",
-    image: "/path/to/sine-image.jpg",
+    image:
+      "https://raw.githubusercontent.com/tirdesh/MyPortfolio/main/app/src/assets/ncnl.jpeg",
     challenges:
       "Generating accurate recommendations based on user preferences and behavior. Ensuring high user satisfaction with recommendations.",
     solutions:
