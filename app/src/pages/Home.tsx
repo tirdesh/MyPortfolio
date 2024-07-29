@@ -5,23 +5,30 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProfilePic from "../assets/ProfilePicc.png";
+import { commandResponses } from "../utils/commandResponses";
 
 const LandingPage: React.FC = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<
     { type: "user" | "bot"; content: string }[]
   >([
-    { type: "bot", content: "Welcome to my interactive portfolio terminal!" },
+    { type: "bot", content: "Welcome to my interactive portfolio!" },
     { type: "bot", content: "Type 'help' to see available commands." },
   ]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const smallScreenChatRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (smallScreenChatRef.current) {
+      smallScreenChatRef.current.scrollTop =
+        smallScreenChatRef.current.scrollHeight;
     }
-  }, [messages]);
+  };
+
+  useEffect(scrollToBottom, [messages]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,64 +41,18 @@ const LandingPage: React.FC = () => {
 
   const processCommand = (command: string) => {
     setTimeout(() => {
-      switch (command) {
-        case "help":
-          setMessages((prev) => [
-            ...prev,
-            {
-              type: "bot",
-              content: "Available commands: about, skills, projects, contact",
-            },
-          ]);
-          break;
-        case "about":
-          setMessages((prev) => [
-            ...prev,
-            {
-              type: "bot",
-              content:
-                "I'm a software developer passionate about creating interactive web experiences.",
-            },
-          ]);
-          break;
-        case "skills":
-          setMessages((prev) => [
-            ...prev,
-            {
-              type: "bot",
-              content:
-                "My skills include: React, TypeScript, Node.js, and more.",
-            },
-          ]);
-          break;
-        case "projects":
-          setMessages((prev) => [
-            ...prev,
-            {
-              type: "bot",
-              content:
-                "Check out my GitHub for a list of projects: https://github.com/yourusername",
-            },
-          ]);
-          break;
-        case "contact":
-          setMessages((prev) => [
-            ...prev,
-            {
-              type: "bot",
-              content: "You can reach me at: your.email@example.com",
-            },
-          ]);
-          break;
-        default:
-          setMessages((prev) => [
-            ...prev,
-            {
-              type: "bot",
-              content: `Command not recognized: ${command}. Type 'help' for available commands.`,
-            },
-          ]);
-      }
+      const response =
+        commandResponses[command as keyof typeof commandResponses] ||
+        commandResponses.default(command);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "bot",
+          content:
+            typeof response === "function" ? response(command) : response,
+        },
+      ]);
     }, 300);
   };
 
@@ -121,9 +82,9 @@ const LandingPage: React.FC = () => {
         {/* Chatbot for small screens */}
         <Card className="w-full max-w-sm mx-auto md:hidden bg-white dark:bg-gray-800 shadow-lg">
           <CardContent className="p-4">
-            <ScrollArea
-              className="h-[400px] w-full rounded border p-4 mb-4 bg-gray-100 dark:bg-gray-900"
-              ref={scrollAreaRef}
+            <div
+              ref={smallScreenChatRef}
+              className="h-[400px] w-full rounded border p-4 mb-4 bg-gray-100 dark:bg-gray-900 overflow-y-auto"
             >
               {messages.map((msg, index) => (
                 <div
@@ -144,7 +105,7 @@ const LandingPage: React.FC = () => {
                   </span>
                 </div>
               ))}
-            </ScrollArea>
+            </div>
             <form onSubmit={handleSubmit} className="flex">
               <Input
                 type="text"
@@ -233,6 +194,7 @@ const LandingPage: React.FC = () => {
                       </div>
                     ))}
                   </pre>
+                  <div ref={messagesEndRef} />
                 </ScrollArea>
                 <form onSubmit={handleSubmit} className="mt-4 flex">
                   <Input
