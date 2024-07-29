@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { AnimatePresence, motion, useAnimation } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Pie } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -27,8 +27,8 @@ const getRandomPosition = (width: number, height: number) => ({
 });
 
 const getRandomVelocity = () => ({
-  x: (Math.random() - 0.5) * 4,
-  y: (Math.random() - 0.5) * 4,
+  x: (Math.random() - 0.5) * 10,
+  y: (Math.random() - 0.5) * 10,
 });
 
 const MIN_BUBBLE_SIZE = 60;
@@ -128,66 +128,77 @@ const Skills: React.FC = () => {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  const pieData = {
-    labels: selectedCategory?.skills.map((skill) => skill.name) || [],
-    datasets: [
-      {
-        data: selectedCategory?.skills.map(() => 1) || [],
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-        ],
-        hoverBackgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-        ],
-      },
-    ],
-  };
-
-  const pieOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: true,
-        position: "right" as const,
-        labels: {
-          color: "white",
-          font: {
-            size: 14,
-          },
+  const pieData = useMemo(
+    () => ({
+      labels: selectedCategory?.skills.map((skill) => skill.name) || [],
+      datasets: [
+        {
+          data: selectedCategory?.skills.map(() => 1) || [],
+          backgroundColor: [
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#4BC0C0",
+            "#9966FF",
+            "#FF9F40",
+          ],
+          hoverBackgroundColor: [
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#4BC0C0",
+            "#9966FF",
+            "#FF9F40",
+          ],
         },
-      },
-      tooltip: {
-        callbacks: {
-          label: (context: { dataIndex: number }) => {
-            const skill = selectedCategory?.skills[context.dataIndex];
-            return skill ? skill.name : "";
-          },
-        },
-      },
-    },
-    onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
-      if (elements.length > 0) {
-        const index = elements[0].index;
-        setSelectedSkill(selectedCategory?.skills[index] || null);
-      }
-    },
-  };
-  const maxSkillCount = Math.max(
-    ...skillCategories.map((category) => category.skills.length)
+      ],
+    }),
+    [selectedCategory]
   );
+
+  const pieOptions = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: "right" as const,
+          labels: {
+            color: "white",
+            font: {
+              size: 14,
+            },
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: (context: { dataIndex: number }) => {
+              const skill = selectedCategory?.skills[context.dataIndex];
+              return skill ? skill.name : "";
+            },
+          },
+        },
+      },
+      onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
+        if (elements.length > 0) {
+          const index = elements[0].index;
+          setSelectedSkill(selectedCategory?.skills[index] || null);
+        }
+      },
+    }),
+    [selectedCategory]
+  );
+
+  const maxSkillCount = useMemo(
+    () =>
+      Math.max(...skillCategories.map((category) => category.skills.length)),
+    []
+  );
+
   return (
     <div className="relative flex-grow flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black p-4 md:p-8 min-h-screen">
+      <p className="text-white mb-4">Click on a skill category to learn more</p>
       <div
         ref={containerRef}
         className="border-4 border-indigo-500 rounded-lg w-full h-[calc(100vh)]"
@@ -199,7 +210,7 @@ const Skills: React.FC = () => {
               category={category}
               onClick={() => {
                 setSelectedCategory(category);
-                setSelectedSkill(null); // Close skill info if another category is clicked
+                setSelectedSkill(null);
               }}
               containerSize={containerSize}
               maxSkillCount={maxSkillCount}

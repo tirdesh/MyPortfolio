@@ -89,17 +89,30 @@ const LandingPage: React.FC = () => {
               {messages.map((msg, index) => (
                 <div
                   key={index}
-                  className={`mb-2 ${
-                    msg.type === "user" ? "text-right" : "text-left"
+                  className={`mb-4 flex ${
+                    msg.type === "user"
+                      ? "justify-end"
+                      : "justify-start items-end"
                   }`}
                 >
+                  {msg.type === "bot" && (
+                    <img
+                      src={ProfilePic}
+                      alt="Tirdesh Pettugani"
+                      className="w-8 h-8 rounded-full mr-2 mb-1"
+                    />
+                  )}
                   <span
                     className={`inline-block p-2 rounded-lg ${
                       msg.type === "user"
                         ? "bg-purple-500 text-white"
                         : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
                     }`}
-                    style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
+                      maxWidth: "80%",
+                    }}
                   >
                     {msg.content}
                   </span>

@@ -124,7 +124,7 @@ const AboutMe: React.FC = () => {
               </Button>
               <Button
                 onClick={toggleRevealAll}
-                className="bg-gray-500 text-white hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500"
+                className="bg-gray-500 text-white hover:bg-gray-600 dark:bg-white dark:text-gray-800 hover:bg-gray-600 dark:hover:bg-gray-200 transition duration-300 ease-in-out"
               >
                 {revealAll ? "Hide All" : "Reveal All"}
               </Button>
