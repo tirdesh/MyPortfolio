@@ -28,7 +28,7 @@ Projects:
 
 Contact: pettugani.t@northeastern.edu | +1 (857) 316-7532 | linkedin.com/in/tirdesh | github.com/tirdesh | Boston, MA
 
-Keep responses concise (2-3 sentences max), friendly, professional, and helpful. Use emojis sparingly.`;
+IMPORTANT: Keep responses SHORT (3-4 sentences maximum) to ensure complete answers. Be friendly, professional, and helpful. Use emojis sparingly. NEVER cut responses mid-sentence.`;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
@@ -70,7 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           { role: 'user', content: message },
         ],
         temperature: 0.7,
-        max_tokens: 150,
+        max_tokens: 300,
       }),
       signal: AbortSignal.timeout(10000),
     });

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import ProfilePic from "../assets/ProfilePicc.png";
 import { generateAIResponse } from "../utils/aiTerminal";
 import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 
 const LandingPage: React.FC = () => {
   const [input, setInput] = useState("");
@@ -113,7 +114,21 @@ const LandingPage: React.FC = () => {
                       maxWidth: "80%",
                     }}
                   >
-                    {msg.content}
+                    {msg.type === "bot" ? (
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => <p className="mb-1">{children}</p>,
+                          strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                          em: ({ children }) => <em className="italic">{children}</em>,
+                          ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+                          li: ({ children }) => <li className="mb-0.5">{children}</li>,
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    ) : (
+                      msg.content
+                    )}
                   </span>
                 </div>
               ))}
@@ -205,7 +220,21 @@ const LandingPage: React.FC = () => {
                         }
                       >
                         {msg.type === "user" ? "$ " : "> "}
-                        {msg.content}
+                        {msg.type === "bot" ? (
+                          <ReactMarkdown
+                            components={{
+                              p: ({ children }) => <p className="mb-1">{children}</p>,
+                              strong: ({ children }) => <strong className="font-bold text-green-400">{children}</strong>,
+                              em: ({ children }) => <em className="italic">{children}</em>,
+                              ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+                              li: ({ children }) => <li className="mb-0.5">{children}</li>,
+                            }}
+                          >
+                            {msg.content}
+                          </ReactMarkdown>
+                        ) : (
+                          msg.content
+                        )}
                       </motion.div>
                     ))}
                     {isTyping && (
