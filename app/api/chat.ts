@@ -1,5 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 const RESUME_CONTEXT = `You are Tirdesh Pettugani's professional assistant on his portfolio website.
 
 Tirdesh's Background:
@@ -30,31 +28,44 @@ Contact: pettugani.t@northeastern.edu | +1 (857) 316-7532 | linkedin.com/in/tird
 
 Keep responses concise (2-3 sentences max), friendly, professional, and helpful. Use emojis sparingly.`;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: Request) {
   // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json',
+  };
 
+  // Handle preflight
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return new Response(null, { status: 200, headers });
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers,
+    });
   }
 
   try {
-    const { message } = req.body;
+    const { message } = await req.json();
 
     if (!message || typeof message !== 'string' || message.length > 500) {
-      return res.status(400).json({ error: 'Invalid message' });
+      return new Response(JSON.stringify({ error: 'Invalid message' }), {
+        status: 400,
+        headers,
+      });
     }
 
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: 'API key not configured' });
+      return new Response(JSON.stringify({ error: 'API key not configured' }), {
+        status: 500,
+        headers,
+      });
     }
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -82,8 +93,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const data = await response.json();
     const aiResponse = data.choices[0]?.message?.content?.trim() || 'I could not generate a response. Please try again.';
 
-    return res.status(200).json({ response: aiResponse });
+    return new Response(JSON.stringify({ response: aiResponse }), {
+      status: 200,
+      headers,
+    });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers,
+    });
   }
 }
