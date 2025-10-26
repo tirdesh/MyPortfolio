@@ -1,3 +1,5 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
 const RESUME_CONTEXT = `You are Tirdesh Pettugani's professional assistant on his portfolio website.
 
 Tirdesh's Background:
@@ -28,44 +30,31 @@ Contact: pettugani.t@northeastern.edu | +1 (857) 316-7532 | linkedin.com/in/tird
 
 Keep responses concise (2-3 sentences max), friendly, professional, and helpful. Use emojis sparingly.`;
 
-export default async function handler(req: Request) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers,
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { message } = await req.json();
+    const { message } = req.body;
 
     if (!message || typeof message !== 'string' || message.length > 500) {
-      return new Response(JSON.stringify({ error: 'Invalid message' }), {
-        status: 400,
-        headers,
-      });
+      return res.status(400).json({ error: 'Invalid message' });
     }
 
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'API key not configured' }), {
-        status: 500,
-        headers,
-      });
+      return res.status(500).json({ error: 'API key not configured' });
     }
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -93,14 +82,8 @@ export default async function handler(req: Request) {
     const data = await response.json();
     const aiResponse = data.choices[0]?.message?.content?.trim() || 'I could not generate a response. Please try again.';
 
-    return new Response(JSON.stringify({ response: aiResponse }), {
-      status: 200,
-      headers,
-    });
+    return res.status(200).json({ response: aiResponse });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers,
-    });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }
