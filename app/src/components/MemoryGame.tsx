@@ -101,6 +101,20 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onClose, onReveal }) => {
     };
   }, [onClose]);
 
+  // Handle timeout for unmatched pairs
+  useEffect(() => {
+    if (flippedCards.length === 2) {
+      const [firstIndex, secondIndex] = flippedCards;
+      if (cards[firstIndex].content !== cards[secondIndex].content) {
+        const timeoutId = setTimeout(() => {
+          setFlippedCards([]);
+        }, 1000);
+        
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [flippedCards, cards]);
+
   const handleCardClick = (index: number) => {
     if (flippedCards.length === 2 || cards[index].revealed) return;
 
@@ -116,11 +130,9 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onClose, onReveal }) => {
             : card
         );
         setCards(newCards);
-        setMatchedPairs(matchedPairs + 1);
-        onReveal(matchedPairs);
+        setMatchedPairs((prev) => prev + 1);
+        onReveal(matchedPairs + 1);
         setFlippedCards([]);
-      } else {
-        setTimeout(() => setFlippedCards([]), 1000);
       }
     }
   };

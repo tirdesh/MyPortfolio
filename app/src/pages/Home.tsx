@@ -5,16 +5,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProfilePic from "../assets/ProfilePicc.png";
-import { commandResponses } from "../utils/commandResponses";
+import { generateAIResponse, generateSmartFallback, getQuickResponse } from "../utils/aiTerminal";
+import { motion } from "framer-motion";
 
 const LandingPage: React.FC = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<
     { type: "user" | "bot"; content: string }[]
   >([
-    { type: "bot", content: "Welcome to my interactive portfolio!" },
-    { type: "bot", content: "Type 'help' to see available commands." },
+    { type: "bot", content: "Welcome to my interactive portfolio! 👋" },
+    { type: "bot", content: "Ask me anything - try 'Tell me about your projects' or 'What are your skills?'" },
   ]);
+  const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const smallScreenChatRef = useRef<HTMLDivElement>(null);
@@ -33,27 +35,24 @@ const LandingPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      setMessages([...messages, { type: "user", content: input }]);
-      processCommand(input.trim().toLowerCase());
+      const userMessage = input.trim();
+      setMessages([...messages, { type: "user", content: userMessage }]);
+      processCommand(userMessage);
       setInput("");
     }
   };
 
-  const processCommand = (command: string) => {
-    setTimeout(() => {
-      const response =
-        commandResponses[command as keyof typeof commandResponses] ||
-        commandResponses.default(command);
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: "bot",
-          content:
-            typeof response === "function" ? response(command) : response,
-        },
-      ]);
-    }, 300);
+  const processCommand = async (command: string) => {
+    setIsTyping(true);
+    
+    try {
+      const response = await generateAIResponse(command);
+      setMessages((prev) => [...prev, { type: "bot", content: response }]);
+    } catch (error) {
+      setMessages((prev) => [...prev, { type: "bot", content: "Sorry, I encountered an error. Please try again." }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   return (
@@ -194,8 +193,11 @@ const LandingPage: React.FC = () => {
                     style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
                   >
                     {messages.map((msg, index) => (
-                      <div
+                      <motion.div
                         key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
                         className={
                           msg.type === "user"
                             ? "text-cyan-400"
@@ -204,18 +206,34 @@ const LandingPage: React.FC = () => {
                       >
                         {msg.type === "user" ? "$ " : "> "}
                         {msg.content}
-                      </div>
+                      </motion.div>
                     ))}
+                    {isTyping && (
+                      <div className="text-green-400">
+                        {"> "}
+                        <motion.span
+                          animate={{ opacity: [1, 0.5, 1] }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        >
+                          Thinking...
+                        </motion.span>
+                      </div>
+                    )}
                   </pre>
                   <div ref={messagesEndRef} />
                 </ScrollArea>
                 <form onSubmit={handleSubmit} className="mt-4 flex">
                   <Input
                     type="text"
-                    placeholder="Type a command..."
+                    placeholder="Ask me anything... (e.g., 'Tell me about your projects')"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     className="flex-grow mr-2 bg-gray-800 text-green-500 border-gray-700"
+                    disabled={isTyping}
                   />
                   <Button
                     type="submit"

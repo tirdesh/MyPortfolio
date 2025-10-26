@@ -25,3 +25,7 @@ DS_Store
 *.sw?
 
 firebaseConfig.ts
+
+# Environment variables
+.env
+.env.local

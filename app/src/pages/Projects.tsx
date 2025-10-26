@@ -33,6 +33,7 @@ import {
 } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useMemo, useState } from "react";
+import PageContainer from "@/components/layout/PageContainer";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -104,14 +105,8 @@ const Projects: React.FC = () => {
   };
 
   return (
-    <div className="flex-grow flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-4 md:p-8 min-h-[calc(100vh-12rem)]">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-7xl mx-auto"
-      >
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
+    <PageContainer maxWidth="7xl">
+      <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
           My Projects
         </h1>
 
@@ -249,7 +244,6 @@ const Projects: React.FC = () => {
             </Button>
           </div>
         )}
-      </motion.div>
 
       <Dialog
         open={!!selectedProject}
@@ -284,7 +278,7 @@ const Projects: React.FC = () => {
           </DialogDescription>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 };
 
