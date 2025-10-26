@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProfilePic from "../assets/ProfilePicc.png";
-import { generateAIResponse, generateSmartFallback, getQuickResponse } from "../utils/aiTerminal";
+import { generateAIResponse } from "../utils/aiTerminal";
 import { motion } from "framer-motion";
 
 const LandingPage: React.FC = () => {
