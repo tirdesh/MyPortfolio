@@ -30,11 +30,15 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
     </h2>
     <div className="space-y-6">
       {items.map((item, index) => (
-        <div
+        <motion.div
           key={index}
-          className="relative pl-8 pb-6 border-l-2 border-purple-500"
+          className="relative pl-8 pb-6 border-l-2 border-purple-500 hover:border-purple-600 transition-colors duration-300"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: index * 0.1 }}
+          whileHover={{ x: 4 }}
         >
-          <div className="absolute w-4 h-4 bg-purple-500 rounded-full -left-[9px] top-0"></div>
+          <div className="absolute w-4 h-4 bg-purple-500 rounded-full -left-[9px] top-0 ring-4 ring-white dark:ring-gray-800 hover:ring-purple-200 dark:hover:ring-purple-900 transition-all duration-300"></div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
             {item.subtitle}
           </h3>
@@ -58,7 +62,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
       ))}
     </div>
   </motion.div>

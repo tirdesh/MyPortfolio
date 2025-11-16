@@ -16,10 +16,10 @@ const SkillCategory: React.FC<{ category: (typeof skillCategories)[0] }> = ({
   const IconComponent = category.icon;
 
   return (
-    <Card className="h-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="h-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
       <CardContent className="p-6">
         <div className="flex items-center mb-4">
-          <IconComponent className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mr-2" />
+          <IconComponent className="w-6 h-6 text-purple-600 dark:text-purple-400 mr-2" />
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
             {category.category}
           </h2>
@@ -48,7 +48,7 @@ const SkillCategory: React.FC<{ category: (typeof skillCategories)[0] }> = ({
         </ul>
         {category.skills.length > 5 && (
           <button
-            className="mt-4 flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-200"
+            className="mt-4 flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 transition-colors duration-200"
             onClick={() => setExpanded(!expanded)}
           >
             {expanded ? (
@@ -69,27 +69,25 @@ const SkillCategory: React.FC<{ category: (typeof skillCategories)[0] }> = ({
 
 const Skills: React.FC = () => {
   return (
-    <div className="flex-grow flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-4 md:p-8 min-h-[calc(100vh-12rem)]">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-7xl mx-auto"
-      >
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {skillCategories.map((category, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <SkillCategory category={category} />
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full"
+    >
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {skillCategories.map((category, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <SkillCategory category={category} />
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
   );
 };
 

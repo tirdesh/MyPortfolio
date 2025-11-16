@@ -5,12 +5,14 @@ interface PageContainerProps {
   children: React.ReactNode;
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "4xl" | "7xl";
   className?: string;
+  embedded?: boolean;
 }
 
 const PageContainer: React.FC<PageContainerProps> = ({
   children,
   maxWidth = "4xl",
   className = "",
+  embedded = false,
 }) => {
   const maxWidthClasses = {
     sm: "max-w-sm",
@@ -46,6 +48,19 @@ const PageContainer: React.FC<PageContainerProps> = ({
       },
     },
   };
+
+  if (embedded) {
+    return (
+      <motion.div
+        variants={contentVariants}
+        initial="hidden"
+        animate="visible"
+        className={`w-full ${maxWidthClasses[maxWidth]} mx-auto ${className}`}
+      >
+        {children}
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

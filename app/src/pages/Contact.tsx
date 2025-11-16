@@ -51,16 +51,21 @@ const Contact: React.FC = () => {
 
   return (
     <PageContainer maxWidth="2xl">
-      <Card className="bg-white dark:bg-gray-800 shadow-lg">
-          <CardContent className="p-6">
-            <motion.h1
-              className="text-4xl font-bold text-gray-800 dark:text-white mb-6 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
+      <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardContent className="p-6 md:p-8">
+            <motion.div
+              className="text-center mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              Contact Me
-            </motion.h1>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+                Let's Connect!
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                Have a project in mind or want to collaborate? I'd love to hear from you.
+              </p>
+            </motion.div>
             {submitted ? (
               <p className="text-green-500 text-center">
                 Thank you for your message! I'll get back to you soon.
@@ -121,7 +126,8 @@ const Contact: React.FC = () => {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+                  className="w-full bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 text-base font-semibold py-6"
+                  aria-label="Submit contact form"
                 >
                   Send Message
                 </Button>

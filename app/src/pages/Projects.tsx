@@ -106,7 +106,7 @@ const Projects: React.FC = () => {
 
   return (
     <PageContainer maxWidth="7xl">
-      <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
+      <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
           My Projects
         </h1>
 
@@ -169,7 +169,7 @@ const Projects: React.FC = () => {
                   boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
                 }}
               >
-                <Card className="h-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden relative">
+                <Card className="h-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden relative group cursor-pointer">
                   {project.featured && (
                     <div className="absolute top-2 right-2 bg-yellow-400 text-gray-800 px-2 py-1 rounded-full text-xs font-semibold">
                       Featured
@@ -178,7 +178,8 @@ const Projects: React.FC = () => {
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
                   />
                   <CardContent className="p-6">
                     <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
@@ -195,7 +196,8 @@ const Projects: React.FC = () => {
                         href={project.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 flex items-center"
+                        className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 flex items-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded px-2 py-1"
+                        aria-label={`View ${project.title} on GitHub`}
                       >
                         <GitHubLogoIcon className="mr-2" /> GitHub
                       </a>
@@ -203,14 +205,16 @@ const Projects: React.FC = () => {
                         href={project.live}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 flex items-center"
+                        className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 flex items-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded px-2 py-1"
+                        aria-label={`View ${project.title} live demo`}
                       >
                         <ExternalLinkIcon className="mr-2" /> Live Demo
                       </a>
                     </div>
                     <button
                       onClick={() => setSelectedProject(project)}
-                      className="mt-4 w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition-colors duration-300"
+                      className="mt-4 w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      aria-label={`Learn more about ${project.title}`}
                     >
                       Learn More
                     </button>
@@ -226,7 +230,8 @@ const Projects: React.FC = () => {
             <Button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="bg-purple-600 text-white"
+              className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              aria-label="Previous page"
             >
               <ChevronLeftIcon className="mr-2" /> Previous
             </Button>
@@ -238,7 +243,8 @@ const Projects: React.FC = () => {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages}
-              className="bg-purple-600 text-white"
+              className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              aria-label="Next page"
             >
               Next <ChevronRightIcon className="ml-2" />
             </Button>

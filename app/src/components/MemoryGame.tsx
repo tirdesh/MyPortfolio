@@ -85,8 +85,12 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onClose, onReveal }) => {
   useEffect(() => {
     if (matchedPairs === initialCards.length / 2) {
       setGameOver(true);
+      // Ensure all items are revealed when game completes
+      // Reveal both items (0 and 1) if not already revealed
+      onReveal(0);
+      onReveal(1);
     }
-  }, [matchedPairs]);
+  }, [matchedPairs, onReveal]);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -130,8 +134,18 @@ const MemoryGame: React.FC<MemoryGameProps> = ({ onClose, onReveal }) => {
             : card
         );
         setCards(newCards);
-        setMatchedPairs((prev) => prev + 1);
-        onReveal(matchedPairs + 1);
+        setMatchedPairs((prev) => {
+          const newMatchedPairs = prev + 1;
+          // Reveal items in order: first match reveals item 0, second match reveals item 1
+          // Ensure we only reveal items 0 and 1 (Education and Experience)
+          if (newMatchedPairs === 1) {
+            onReveal(0); // First match -> Education
+          } else if (newMatchedPairs === 2) {
+            onReveal(1); // Second match -> Experience
+          }
+          // For additional matches (if any), don't reveal more items
+          return newMatchedPairs;
+        });
         setFlippedCards([]);
       }
     }

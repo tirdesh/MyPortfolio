@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface Question {
   text: string;
@@ -63,39 +63,62 @@ const QuizGame: React.FC<QuizGameProps> = ({ onClose, onReveal }) => {
   const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [gameOver, setGameOver] = useState(false);
+  // Use ref to track current answer without causing timer reset
+  const selectedAnswerRef = useRef<number | null>(null);
 
-  const handleSubmit = useCallback(() => {
-    if (selectedAnswer === null) {
+  const handleSubmit = useCallback((answerOverride?: number | null) => {
+    // Use override value if provided (from timer), otherwise use state
+    const answerToUse = answerOverride !== undefined ? answerOverride : selectedAnswer;
+    
+    if (answerToUse === null) {
       // Time's up or no answer selected
       setShowResult(true);
       return;
     }
 
     if (
-      shuffledOptions[selectedAnswer] ===
+      shuffledOptions[answerToUse] ===
       questions[currentQuestion].options[
         questions[currentQuestion].correctAnswer
       ]
     ) {
-      setScore(score + 1);
+      setScore((prevScore) => prevScore + 1);
     }
 
-    onReveal(currentQuestion);
+    // Reveal items in order: map question index to aboutItems index
+    // Question 0 -> aboutItems[0] (Education)
+    // Question 1 -> aboutItems[1] (Experience)
+    // Question 2+ -> aboutItems[1] (Experience) - if more questions than items
+    const itemIndex = Math.min(currentQuestion, 1);
+    onReveal(itemIndex);
     setShowResult(true);
-  }, [selectedAnswer, shuffledOptions, currentQuestion, score, onReveal]);
+  }, [selectedAnswer, shuffledOptions, currentQuestion, onReveal]);
 
   useEffect(() => {
     setShuffledOptions(shuffleArray([...questions[currentQuestion].options]));
     setSelectedAnswer(null);
+    selectedAnswerRef.current = null;
     setTimeLeft(30);
+    setShowResult(false);
   }, [currentQuestion]);
+
+  // Update ref whenever selectedAnswer changes (without resetting timer)
+  useEffect(() => {
+    selectedAnswerRef.current = selectedAnswer;
+  }, [selectedAnswer]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(timer);
-          handleSubmit();
+          // When time runs out, check if there's an answer and handle accordingly
+          if (selectedAnswerRef.current !== null) {
+            // Use the ref value to call handleSubmit with current answer
+            handleSubmit(selectedAnswerRef.current);
+          } else {
+            setShowResult(true);
+          }
           return 0;
         }
         return prevTime - 1;
@@ -121,7 +144,9 @@ const QuizGame: React.FC<QuizGameProps> = ({ onClose, onReveal }) => {
   const handleNext = () => {
     if (currentQuestion >= questions.length - 1) {
       setGameOver(true);
-      questions.forEach((_, index) => onReveal(index));
+      // Ensure all items are revealed when quiz completes (0 and 1)
+      onReveal(0);
+      onReveal(1);
     } else {
       setShowResult(false);
       setCurrentQuestion(currentQuestion + 1);
@@ -204,9 +229,14 @@ const QuizGame: React.FC<QuizGameProps> = ({ onClose, onReveal }) => {
             </div>
           </div>
           <RadioGroup
-            onValueChange={(value) => setSelectedAnswer(parseInt(value))}
+            onValueChange={(value) => {
+              const parsedValue = parseInt(value);
+              if (!isNaN(parsedValue)) {
+                setSelectedAnswer(parsedValue);
+              }
+            }}
             value={
-              selectedAnswer !== null ? selectedAnswer.toString() : undefined
+              selectedAnswer !== null ? selectedAnswer.toString() : ""
             }
             className="space-y-2"
           >

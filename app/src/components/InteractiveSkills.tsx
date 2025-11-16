@@ -92,10 +92,11 @@ const SkillCategoryBubble: React.FC<{
 
   return (
     <motion.div
-      className="absolute flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-white cursor-pointer"
+      className="absolute flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-600 text-white cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all duration-300"
       style={{ width: bubbleSize, height: bubbleSize }}
       animate={controls}
       onClick={onClick}
+      whileHover={{ scale: 1.05 }}
     >
       <span className="text-center text-sm">{category.category}</span>
     </motion.div>
@@ -201,7 +202,7 @@ const Skills: React.FC = () => {
       <p className="text-white mb-4">Click on a skill category to learn more</p>
       <div
         ref={containerRef}
-        className="border-4 border-indigo-500 rounded-lg w-full h-[calc(100vh)]"
+        className="border-4 border-purple-500 rounded-lg w-full h-[calc(100vh)]"
       >
         {!selectedCategory &&
           skillCategories.map((category, index) => (
@@ -249,7 +250,7 @@ const Skills: React.FC = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             className="absolute inset-0 flex items-center justify-center"
                           >
-                            <div className="relative bg-gray-800 rounded-full w-[45%] h-[45%] flex items-center justify-center p-4 border-2 border-indigo-300">
+                            <div className="relative bg-gray-800 rounded-full w-[45%] h-[45%] flex items-center justify-center p-4 border-2 border-purple-400">
                               <button
                                 className="absolute top-1 right-1 text-white z-10 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-xs"
                                 onClick={() => setSelectedSkill(null)}
