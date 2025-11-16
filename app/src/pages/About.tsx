@@ -16,19 +16,10 @@ const aboutItems = [
       {
         subtitle: "Northeastern University, Boston, MA",
         content: "Master of Science in Information Systems",
-        date: "Expected 05/2025",
+        date: "December 2025",
         details: [
-          "GPA: 3.8/4",
-          "Related Courses: Web Design and User Experience, Program Structures and Algorithms, OOD and AED",
-        ],
-      },
-      {
-        subtitle: "Bennett University, Delhi, India",
-        content: "Bachelor of Technology in Computer Science and Engineering",
-        date: "May 2020",
-        details: [
-          "GPA: 8.57/10",
-          "Related Courses: High Performance Computing, Operating Systems, Artificial Intelligence and Machine Learning, Big Data and Cloud Computing",
+          "GPA: 3.7/4",
+          "Related Courses: Knowledge Graphs with LLM/Graph DB, WebDev Tools, Program Structures and Algorithms",
         ],
       },
     ],
@@ -37,34 +28,43 @@ const aboutItems = [
     title: "Experience",
     items: [
       {
+        subtitle: "DMSB AI Strategic Hub, Boston, USA",
+        content: "Software Developer & AI Engineer",
+        date: "08/2025 – Current",
+        details: [
+          "Designed and deployed dashlab.io as DASH Lab's public-facing platform, showcasing research innovations that generated partnership discussions and attracted inquiries from 5+ potential investors and industry stakeholders.",
+          "Enriched 70K+ alumni records by engineering automated web scraping pipelines and third-party API integrations, transforming disparate data sources into structured datasets for targeted outreach.",
+          "Launched AI-driven educational tools, including EssayBot (streamlined essay grading using Gemma models deployed on A6000 infrastructure) and PresBot (real-time presentation coaching powered by voice cloning ML models), transforming manual processes into scalable, personalized feedback systems.",
+        ],
+      },
+      {
+        subtitle: "Wave Life Sciences, Lexington, USA",
+        content: "IT Intern",
+        date: "01/2025 – 06/2025",
+        details: [
+          "Architected an AI-assisted knowledge retrieval system using Gemini models and Vertex AI with RAG capabilities, developing a Python FastAPI backend to process research documents and power an internal chatbot for intelligent query responses.",
+          "Developed interactive dashboards integrating multiple service APIs for data visualization and automated reporting, reducing manual data compilation time by 60% and streamlining cross-team access to research information.",
+        ],
+      },
+      {
         subtitle: "Commvault Systems, Hyderabad, India",
         content: "Software Development Engineer",
         date: "01/2021 – 08/2023",
         details: [
-          "Collaborated on 7+ revenue-generating projects, earning spot bonuses for UI/UX enhancements and recognition for contributions.",
-          "Led migration of Angular applications to React, optimizing performance, and significantly enhancing user experience across projects involving technologies like HDFS, Spark, Impala, Kudu.",
-          "Developed a Selenium-Python automation framework for GitHub and Azure DevOps repositories, boosting testing efficiency by 85% and reducing response time by 50%.",
-          "Defined comprehensive automation strategies, vastly enhancing software testing processes and automation efficiency in collaboration with cross-functional teams.",
-          "Conducted regular code reviews to enhance code quality, analyzed and resolved over 200 customer escalations, led three projects from design to deployment, and mentored 5 interns in Python.",
+          "Contributed to 7+ revenue-generating projects over 4 years, delivering key features and enhancements that earned spot bonuses and company recognition for technical excellence.",
+          "Designed and engineered responsive React components from Figma mockups, collaborating with design and backend teams to ensure seamless UI/UX and efficient data integration via GraphQL and REST APIs.",
+          "Implemented a Selenium-Python automation framework to validate backup and recovery functionality for GitHub and Azure DevOps repositories, boosting verification efficiency by 85% and reducing validation time by 50%.",
+          "Led 3 full-cycle projects from design to deployment, conducted code reviews to maintain quality standards, and mentored 5 junior engineers in Python development and best practices.",
+          "Resolved 200+ customer escalations through systematic debugging and root cause analysis, improving product reliability and customer satisfaction.",
         ],
       },
       {
         subtitle: "Commvault Systems, Hyderabad, India",
         content: "Associate Engineer",
-        date: "07/2020 – 01/2021",
+        date: "01/2020 – 01/2021",
         details: [
-          "Created a prize-winning Chrome extension using Node.js and web hooks for enhanced web navigation during the Create 2020 Hackathon.",
-          "Managed various Hadoop distributions and MongoDB setups, conducted bare metal recovery across UNIX systems including Rocky Linux, RedHat, CentOS, Ubuntu, and more.",
-          "Designed and implemented new regression-focused automation test cases, introduced Agile methodologies reducing time-to-market by 25%, and maintained automation scripts that cut manual testing by 30%.",
-        ],
-      },
-      {
-        subtitle: "Commvault Systems, Hyderabad, India",
-        content: "Intern",
-        date: "01/2020 – 07/2020",
-        details: [
-          "Automated and validated MongoDB functionality using Python and Selenium and maintained the test automation framework for the MongoDB backup agent while participating in comprehensive testing.",
-          "Streamlined features using Python, integrating backend APIs with the requests library for validation and refactoring existing automation code for efficiency.",
+          "Won internal hackathon (Create 2020) by developing a Chrome extension using Node.js and webhooks that enhanced web navigation workflows for internal tools.",
+          "Managed Hadoop distributions and MongoDB deployments, conducting bare metal recovery across UNIX systems (Rocky Linux, RedHat, CentOS, Ubuntu) to ensure system reliability and data integrity.",
         ],
       },
     ],

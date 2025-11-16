@@ -15,9 +15,24 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: "learnx",
+    title: "LearnX",
+    description: "iOS learning platform for mastering Data Structures and Algorithms with structured modules, interactive quizzes, real-time progress tracking, and community-driven discussion forums for mobile-first learning.",
+    tech: ["iOS", "SwiftUI", "Firebase"],
+    github: "https://github.com/tirdesh/learnx",
+    live: "https://youtu.be/lk7-5Qedr1o",
+    image:
+      "https://raw.githubusercontent.com/tirdesh/MyPortfolio/main/app/src/assets/ncnl.jpeg",
+    featured: true,
+    challenges:
+      "Creating an engaging mobile-first learning experience with real-time progress tracking and community features.",
+    solutions:
+      "Developed an iOS app using SwiftUI for native performance and Firebase for real-time data synchronization, enabling seamless progress tracking and community interactions.",
+  },
+  {
     id: "magicletter",
     title: "MagicLetter",
-    description: "Cover letter generation application",
+    description: "Scalable cover letter generation application using Firebase and AI providers (Cohere, OpenAI, Claude) with real-time preview, multiple templates, and easy customization for streamlined job application workflows.",
     tech: [
       "Vite",
       "React",
@@ -25,6 +40,9 @@ export const projects: Project[] = [
       "Shadcn-ui",
       "Tailwind CSS",
       "TypeScript",
+      "Cohere",
+      "OpenAI",
+      "Claude",
     ],
     github: "https://github.com/tirdesh/magicletter",
     live: "https://magicletter.vercel.app",
@@ -34,22 +52,22 @@ export const projects: Project[] = [
     challenges:
       "Ensuring generated cover letters are personalized and relevant. Managing diverse job descriptions and user profiles effectively.",
     solutions:
-      "Developed a custom algorithm to match job descriptions with user skills and experiences. Integrated AI providers for improved content relevance and customization.",
+      "Developed a custom algorithm to match job descriptions with user skills and experiences. Integrated multiple AI providers (Cohere, OpenAI, Claude) for improved content relevance and customization with real-time preview capabilities.",
   },
   {
     id: "findaroomie",
-    title: "FindARoomie",
-    description: "Roommate finder application",
-    tech: ["React", "Tailwind CSS", "TypeScript"],
+    title: "Find A Roomie",
+    description: "Web application streamlining accommodation search for international students with integrated real-time messaging, blog features, and collaborative tools to facilitate roommate connections.",
+    tech: ["MERN stack", "React", "Node.js", "MongoDB", "Express"],
     github: "https://github.com/tirdesh/findaroomie",
     live: "https://find-a-roomie.vercel.app",
     image:
       "https://raw.githubusercontent.com/tirdesh/FindARoomie/main/frontend/public/logo512.png",
     featured: true,
     challenges:
-      "Implementing advanced search functionality for finding suitable roommates based on various criteria.",
+      "Implementing real-time messaging and collaborative features for international students to find suitable roommates.",
     solutions:
-      "Utilized React hooks for efficient state management and search filtering. Enhanced search algorithms to refine results based on user preferences.",
+      "Utilized MERN stack for full-stack development with real-time messaging capabilities. Enhanced search algorithms and integrated blog features to facilitate better roommate connections and community building.",
   },
   {
     id: "intellidiary",
