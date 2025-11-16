@@ -263,7 +263,7 @@ const QuizGame: React.FC<QuizGameProps> = ({ onClose, onReveal }) => {
           <AnimatePresence>
             {!showResult ? (
               <Button
-                onClick={handleSubmit}
+                onClick={() => handleSubmit()}
                 disabled={selectedAnswer === null}
                 className="w-full"
               >

@@ -65,7 +65,6 @@ export const Header: React.FC = () => {
         
         if (section) {
           const sectionTop = section.offsetTop;
-          const sectionBottom = sectionTop + section.offsetHeight;
           
           // If scroll position is past the start of this section, this is the active one
           if (scrollPosition >= sectionTop - 100) {
