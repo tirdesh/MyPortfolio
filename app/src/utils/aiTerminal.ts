@@ -1,9 +1,6 @@
-import { buildResumeContext } from '../content/profile.mjs';
-// AI Terminal utility - Real LLM integration using Groq API (fast & free)
-// Just add your API key to .env and it works!
-
-// Shared with api/chat.ts -- one description of me in the codebase.
-const RESUME_CONTEXT = buildResumeContext();
+// Chat client. Calls the /api/chat route, which holds the Groq key and builds
+// the prompt from src/content/profile.mjs. Falls back to pattern-matched
+// replies if the route is unavailable. No API key belongs in this file.
 
 // Use backend API route (secure) - falls back to smart responses if backend unavailable
 export const generateAIResponse = async (userMessage: string): Promise<string> => {
@@ -34,36 +31,11 @@ export const generateAIResponse = async (userMessage: string): Promise<string> =
       // Backend not available, fall through to fallback
     }
 
-    // Fallback: Try direct API call (for local development with API key)
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-    
-    if (apiKey) {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          // Groq decommissioned llama-3.1-8b-instant. The server route at
-          // api/chat.ts resolves a model at runtime; this browser fallback
-          // just names the current best directly.
-          model: "openai/gpt-oss-20b",
-          messages: [
-            { role: "system", content: RESUME_CONTEXT },
-            { role: "user", content: userMessage }
-          ],
-          temperature: 0.7,
-          max_tokens: 600,
-        }),
-        signal: AbortSignal.timeout(10000),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data.choices[0]?.message?.content?.trim() || generateSmartFallback(userMessage);
-      }
-    }
+    // A browser-side Groq call used to live here, gated on
+    // import.meta.env.VITE_GROQ_API_KEY. Vite inlines VITE_-prefixed values
+    // into the client bundle, so setting that variable would have published
+    // the API key to every visitor. Removed: the server route at api/chat.ts
+    // is the only path that should hold the key.
 
     // Final fallback: Smart pattern matching
     return generateSmartFallback(userMessage);

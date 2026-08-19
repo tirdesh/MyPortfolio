@@ -1,13 +1,16 @@
-import { Linkedin, Mail, Phone } from "lucide-react";
+import { Linkedin, Mail, Phone, Rss } from "lucide-react";
 import React from "react";
 import { siGithub } from "simple-icons";
 
 export const Footer: React.FC = () => {
+  // Was hardcoded to 2024 and went stale for two years.
+  const year = new Date().getFullYear();
+
   return (
     <footer className="sticky bottom-0 z-40 p-4 md:p-5 bg-background/95 backdrop-blur-sm border-t border-border/40 text-foreground">
       <div className="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center">
         <p className="mb-3 md:mb-0 text-sm md:text-base">
-          &copy; 2024 No Code No Life. All rights reserved.
+          &copy; {year} No Code No Life. All rights reserved.
         </p>
         <div className="flex space-x-4">
           <a
@@ -42,6 +45,13 @@ export const Footer: React.FC = () => {
             className="focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
           >
             <Mail className="w-5 h-5 hover:text-primary transition-colors duration-200" />
+          </a>
+          <a
+            href="/blog/rss.xml"
+            aria-label="Blog RSS feed"
+            className="focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
+          >
+            <Rss className="w-5 h-5 hover:text-primary transition-colors duration-200" />
           </a>
           <a 
             href="tel:+18573167532"

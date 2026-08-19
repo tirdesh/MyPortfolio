@@ -71,9 +71,64 @@ function cleanReply(text: string): string {
     .trim();
 }
 
+
+// ---------------------------------------------------------------------------
+// Abuse guards.
+//
+// This route is an unauthenticated proxy to a paid-quota LLM. It previously
+// sent Access-Control-Allow-Origin: * with no rate limit, so anyone could
+// point a script at it and exhaust the Groq quota -- which takes the
+// assistant down for actual visitors.
+// ---------------------------------------------------------------------------
+
+const ALLOWED_ORIGINS = new Set([
+  'https://tirdesh.me',
+  'https://www.tirdesh.me',
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'http://localhost:4321',
+]);
+
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+
+// Per-instance and therefore best effort: serverless spreads traffic across
+// instances, so the effective ceiling is higher than RATE_LIMIT_MAX. It still
+// stops a single client hammering one warm instance, which is the cheap attack.
+// A hard global limit would need shared storage (KV/Redis).
+const hits = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  recent.push(now);
+  hits.set(ip, recent);
+
+  // Keep the map from growing without bound on a long-lived instance.
+  if (hits.size > 500) {
+    for (const [key, times] of hits) {
+      if (!times.some((t) => now - t < RATE_LIMIT_WINDOW_MS)) hits.delete(key);
+    }
+  }
+
+  return recent.length > RATE_LIMIT_MAX;
+}
+
+function clientIp(req: VercelRequest): string {
+  const fwd = req.headers['x-forwarded-for'];
+  const raw = Array.isArray(fwd) ? fwd[0] : fwd;
+  return (raw ?? '').split(',')[0].trim() || 'unknown';
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Reflect the origin only when it's one of ours. Omitting the header makes
+  // browsers block cross-site reads; it does not stop a direct curl, which is
+  // what the rate limit below is for.
+  const origin = req.headers.origin;
+  if (typeof origin === 'string' && ALLOWED_ORIGINS.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -83,6 +138,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (isRateLimited(clientIp(req))) {
+    res.setHeader('Retry-After', '60');
+    return res.status(429).json({ error: 'Too many requests, please slow down' });
   }
 
   try {
