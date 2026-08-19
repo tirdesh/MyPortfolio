@@ -1,4 +1,14 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/blog",
+      "destination": "https://tirdesh-blog.vercel.app/"
+    },
+    {
+      "source": "/blog/:path*",
+      "destination": "https://tirdesh-blog.vercel.app/:path*"
+    }
+  ]
 }
