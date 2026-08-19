@@ -29,3 +29,5 @@ firebaseConfig.ts
 # Environment variables
 .env
 .env.local
+.vercel
+.env*

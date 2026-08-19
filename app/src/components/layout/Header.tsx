@@ -279,6 +279,16 @@ export const Header: React.FC = () => {
                   {link.label}
                 </Link>
               ))}
+              {/* Plain anchor, not <Link>: /blog is served by a Vercel rewrite,
+                  not a React route, so react-router would match the "*" route
+                  and redirect to home. */}
+              <a
+                href="/blog"
+                className="text-foreground hover:text-primary transition-colors relative"
+                onClick={() => setIsOpen(false)}
+              >
+                Blog
+              </a>
             </nav>
           </SheetContent>
         </Sheet>
@@ -296,6 +306,16 @@ export const Header: React.FC = () => {
             {link.label}
           </Link>
         ))}
+        {/* Plain anchor, not <Link>: /blog is served by a Vercel rewrite, not a
+            React route, so react-router would match the "*" route and redirect
+            to home. */}
+        <a
+          href="/blog"
+          className="text-foreground hover:text-primary transition-colors relative"
+          aria-label="Read the blog"
+        >
+          Blog
+        </a>
       </nav>
 
       <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0 min-w-[80px] md:min-w-[120px] justify-end">
