@@ -64,7 +64,7 @@ const AboutMe: React.FC = () => {
         </Button>
         <Button
           onClick={toggleRevealAll}
-          className="bg-gray-500 text-white hover:bg-gray-600 dark:bg-white dark:text-gray-800 hover:bg-gray-600 dark:hover:bg-gray-200 transition-all duration-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          className="bg-gray-500 text-white hover:bg-gray-600 dark:bg-white dark:text-gray-800 dark:hover:bg-gray-200 transition-all duration-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           aria-label={allRevealed ? "Hide all details" : "Reveal all details"}
         >
           {allRevealed ? "Hide All" : "Reveal All"}
