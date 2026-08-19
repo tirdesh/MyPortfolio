@@ -15,9 +15,7 @@ export const commandResponses = {
   experience: `Let me share some chapters from my professional journey! 💼 I'm currently a Microsoft 365 Copilot Engineer at Wave Life Sciences. Before that I spent over four years at Commvault Systems in Hyderabad, India, growing from an intern to a Software Development Engineer. Each role has presented unique challenges and opportunities. I started as an intern, eager to learn, and gradually took on more responsibilities, leading projects and mentoring others. If you want to dive deeper into my roles and the stories behind them, just say 'experience details'!`,
 
   "experience details": `During my time at Commvault, I embarked on many adventures:
-    - I led the migration of Angular applications to React, a journey that significantly improved performance and user experience.
     - I developed a Selenium-Python automation framework, boosting testing efficiency by 85%, which felt like a major victory!
-    - One of my proudest moments was implementing a machine learning-based anomaly detection system that enhanced security threat detection by 40%. 
     - I also had the joy of mentoring interns, helping them navigate their paths in the tech world.
     Each experience has shaped me into the developer I am today. Want to hear about the projects that have defined my journey?`,
 
