@@ -82,13 +82,16 @@ export const generateAIResponse = async (userMessage: string): Promise<string> =
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
+          // Groq decommissioned llama-3.1-8b-instant. The server route at
+          // api/chat.ts resolves a model at runtime; this browser fallback
+          // just names the current best directly.
+          model: "openai/gpt-oss-20b",
           messages: [
             { role: "system", content: RESUME_CONTEXT },
             { role: "user", content: userMessage }
           ],
           temperature: 0.7,
-          max_tokens: 150,
+          max_tokens: 600,
         }),
         signal: AbortSignal.timeout(10000),
       });
