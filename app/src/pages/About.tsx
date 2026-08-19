@@ -8,7 +8,7 @@ import MemoryGame from "../components/MemoryGame";
 import QuizGame from "../components/QuizGame";
 import Timeline from "../components/Timeline";
 import PageContainer from "@/components/layout/PageContainer";
-import { education, experience } from "../content/profile";
+import { education, experience } from "../content/profile.mjs";
 
 const aboutItems = [
   { title: "Education", items: education },

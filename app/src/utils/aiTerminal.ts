@@ -1,10 +1,9 @@
-import { buildResumeContext } from '../content/profile';
-import { projects } from '../content/ProjectList';
+import { buildResumeContext } from '../content/profile.mjs';
 // AI Terminal utility - Real LLM integration using Groq API (fast & free)
 // Just add your API key to .env and it works!
 
 // Shared with api/chat.ts -- one description of me in the codebase.
-const RESUME_CONTEXT = buildResumeContext(projects);
+const RESUME_CONTEXT = buildResumeContext();
 
 // Use backend API route (secure) - falls back to smart responses if backend unavailable
 export const generateAIResponse = async (userMessage: string): Promise<string> => {

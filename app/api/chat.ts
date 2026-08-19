@@ -1,10 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { buildResumeContext } from '../src/content/profile';
-import { projects } from '../src/content/ProjectList';
+import { buildResumeContext } from '../src/content/profile.mjs';
 
 // Prompt is derived from the same data the About page renders, so the
 // assistant cannot drift out of date independently of the visible site.
-const RESUME_CONTEXT = buildResumeContext(projects);
+const RESUME_CONTEXT = buildResumeContext();
 
 
 // ---------------------------------------------------------------------------

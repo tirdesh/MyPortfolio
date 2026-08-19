@@ -7,16 +7,13 @@
 // from the same data the site renders means the assistant cannot fall out of
 // date without the visible pages falling out of date too.
 //
-// Deliberately framework-free: no JSX, no React, no icon imports, so the
-// Vercel serverless function at api/chat.ts can import this without pulling
-// the UI dependency tree into its bundle.
-
-export interface TimelineEntry {
-  subtitle: string;
-  content: string;
-  date: string;
-  details: string[];
-}
+// Plain .mjs on purpose. Vercel transpiles api/*.ts file-by-file rather than
+// bundling, so a cross-directory TypeScript import from the function fails at
+// runtime with ERR_MODULE_NOT_FOUND. A .mjs file imported with its explicit
+// extension needs no compilation, so Node resolves it directly.
+//
+// Also framework-free -- no JSX, no React, no icon imports -- so importing it
+// into the serverless function drags in nothing from the UI tree.
 
 export const identity = {
   name: "Tirdesh Pettugani",
@@ -30,7 +27,7 @@ export const identity = {
   yearsExperience: "4+",
 };
 
-export const education: TimelineEntry[] = [
+export const education = [
   {
     subtitle: "Northeastern University, Boston, MA",
     content: "Master of Science in Information Systems",
@@ -48,7 +45,7 @@ export const education: TimelineEntry[] = [
   }
 ];
 
-export const experience: TimelineEntry[] = [
+export const experience = [
   {
     subtitle: "Wave Life Sciences, Lexington, USA",
     content: "Microsoft 365 Copilot Engineer",
@@ -163,13 +160,81 @@ export const skillsSummary = [
   "Tools: Git, Azure DevOps, Selenium, UiPath, Power Automate, Power BI, Copilot Studio",
 ];
 
-const renderEntries = (entries: TimelineEntry[]): string =>
+
+// Compact project list for the assistant.
+//
+// ProjectList.tsx stays authoritative for the Projects page -- it carries the
+// UI-only fields (image, links, challenges/solutions) and imports icon
+// components, so the serverless function can't read it. These summaries need
+// updating alongside it; that is the one remaining overlap after
+// consolidating the prompt.
+export const projectSummaries = [
+  {
+    title: "LearnX",
+    tech: ["iOS", "SwiftUI", "Firebase"],
+    description:
+      "iOS learning platform for mastering Data Structures and Algorithms with structured modules, interactive quizzes, real-time progress tracking, and community-driven discussion forums for mobile-first learning.",
+  },
+  {
+    title: "MagicLetter",
+    tech: ["Vite", "React", "Firebase", "Shadcn-ui"],
+    description:
+      "Scalable cover letter generation application using Firebase and AI providers (Cohere, OpenAI, Claude) with real-time preview, multiple templates, and easy customization for streamlined job application workflows.",
+  },
+  {
+    title: "Find A Roomie",
+    tech: ["MERN stack", "React", "Node.js", "MongoDB"],
+    description:
+      "Web application streamlining accommodation search for international students with integrated real-time messaging, blog features, and collaborative tools to facilitate roommate connections.",
+  },
+  {
+    title: "IntelliDiary",
+    tech: ["MERN stack", "Artificial Intelligence"],
+    description:
+      "AI-powered journal diary app for BuildSpace.so",
+  },
+  {
+    title: "DispatchGenius",
+    tech: ["Java", "JavaFX", "FXML", "CSS"],
+    description:
+      "Delivery management system for international students",
+  },
+  {
+    title: "EatWise",
+    tech: ["Java", "JavaFX", "FXML", "CSS"],
+    description:
+      "Dietary management system",
+  },
+];
+
+// The About page renders every bullet. The assistant does not need them.
+//
+// Sending all 37 experience bullets came to ~2,300 tokens on every single
+// message: it burns Groq's per-minute token quota, adds prompt-processing
+// latency, and buries the answer for a reply that is capped at 3-4 sentences.
+// Recent roles keep more detail than old ones, which is how a reader would
+// skim it anyway. This is a projection of the same data, not a second copy.
+const DETAIL_CAP_RECENT = 3;
+const DETAIL_CAP_OLDER = 1;
+const RECENT_ROLE_COUNT = 4;
+
+const renderEntries = (entries, cap = Infinity) =>
   entries
-    .map(
-      (e) =>
+    .map((e, i) => {
+      const limit =
+        cap !== Infinity
+          ? i < RECENT_ROLE_COUNT
+            ? DETAIL_CAP_RECENT
+            : DETAIL_CAP_OLDER
+          : Infinity;
+      const shown = e.details.slice(0, limit);
+      const omitted = e.details.length - shown.length;
+      return (
         `- ${e.content}, ${e.subtitle} (${e.date}):\n` +
-        e.details.map((d) => `    - ${d}`).join("\n")
-    )
+        shown.map((d) => `    - ${d}`).join("\n") +
+        (omitted > 0 ? `\n    - (+${omitted} more, see the About page)` : "")
+      );
+    })
     .join("\n");
 
 /**
@@ -177,12 +242,15 @@ const renderEntries = (entries: TimelineEntry[]): string =>
  * Both the serverless route and the in-browser fallback call this, so there is
  * exactly one description of me in the codebase.
  */
-export function buildResumeContext(
-  projects: Array<{ title: string; description: string; tech: string[] }> = []
-): string {
+export function buildResumeContext(projects = projectSummaries) {
   const projectLines = projects
-    .slice(0, 6)
-    .map((p) => `- ${p.title} (${p.tech.slice(0, 4).join(", ")}): ${p.description}`)
+    .slice(0, 5)
+    .map(
+      (p) =>
+        `- ${p.title} (${p.tech.slice(0, 3).join(", ")}): ${p.description.slice(0, 130)}${
+          p.description.length > 130 ? "..." : ""
+        }`
+    )
     .join("\n");
 
   return `You are ${identity.name} speaking directly to visitors on your portfolio website. Always answer in first person (use "I", "my", "me").
@@ -195,7 +263,7 @@ My Education:
 ${renderEntries(education)}
 
 My Experience:
-${renderEntries(experience)}
+${renderEntries(experience, DETAIL_CAP_RECENT)}
 
 My Technical Skills:
 ${skillsSummary.map((s) => `- ${s}`).join("\n")}
