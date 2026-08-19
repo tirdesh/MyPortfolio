@@ -41,7 +41,7 @@ const questions: Question[] = [
     options: ["Google", "Microsoft", "Commvault Systems", "Amazon"],
     correctAnswer: 2,
     revealInfo:
-      "I spent over 3 years at Commvault Systems, growing from an intern to a Software Development Engineer.",
+      "I spent over 4 years at Commvault Systems, growing from an intern to a Software Development Engineer.",
   },
   // Add more questions as needed
 ];
