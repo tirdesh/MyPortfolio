@@ -115,8 +115,8 @@ const LandingPage: React.FC = () => {
                 className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                 onClick={() => {
                   const link = document.createElement("a");
-                  link.href = "/Tirdesh-Resume.pdf";
-                  link.download = "Tirdesh-Resume.pdf";
+                  link.href = "/Tirdesh-Pettugani-Resume.pdf";
+                  link.download = "Tirdesh-Pettugani-Resume.pdf";
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
@@ -239,8 +239,8 @@ const LandingPage: React.FC = () => {
                   className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                   onClick={() => {
                     const link = document.createElement("a");
-                    link.href = "/Tirdesh-Resume.pdf";
-                    link.download = "Tirdesh-Resume.pdf";
+                    link.href = "/Tirdesh-Pettugani-Resume.pdf";
+                    link.download = "Tirdesh-Pettugani-Resume.pdf";
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);

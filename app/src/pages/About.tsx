@@ -28,9 +28,18 @@ const aboutItems = [
     title: "Experience",
     items: [
       {
+        subtitle: "Wave Life Sciences, Lexington, USA",
+        content: "Microsoft 365 Copilot Engineer",
+        date: "04/2026 – Current",
+        details: [
+          "Engineered and deployed conversational AI solutions using Microsoft Copilot Studio, including an NDA agent and a Freshservice-integrated IT ticketing bot, leading end-to-end testing, debugging, and feedback cycles to streamline enterprise service workflows.",
+          "Directed the full AI agent lifecycle and automation strategy, from debugging complex deployment pipelines to leading feasibility studies on Copilot-driven workflows, ultimately defining technical prerequisites and presenting scalable architectures to senior leadership.",
+        ],
+      },
+      {
         subtitle: "DMSB AI Strategic Hub, Boston, USA",
         content: "Software Developer & AI Engineer",
-        date: "08/2025 – Current",
+        date: "08/2025 – 12/2025",
         details: [
           "Designed and deployed dashlab.io as DASH Lab's public-facing platform, showcasing research innovations that generated partnership discussions and attracted inquiries from 5+ potential investors and industry stakeholders.",
           "Enriched 70K+ alumni records by engineering automated web scraping pipelines and third-party API integrations, transforming disparate data sources into structured datasets for targeted outreach.",

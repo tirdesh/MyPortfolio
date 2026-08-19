@@ -324,7 +324,7 @@ export const Header: React.FC = () => {
             className="bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 text-xs md:text-sm h-8 md:h-9 px-2 md:px-4"
             asChild
           >
-            <a href="/Tirdesh-Resume.pdf" download className="flex items-center gap-1.5" aria-label="Download resume">
+            <a href="/Tirdesh-Pettugani-Resume.pdf" download className="flex items-center gap-1.5" aria-label="Download resume">
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">Download CV</span>
               <span className="sm:hidden">CV</span>
