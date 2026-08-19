@@ -40,7 +40,10 @@ Also writes about engineering at tirdesh.me/blog.
 
 Contact: pettugani.t@northeastern.edu | +1 (857) 316-7532 | linkedin.com/in/tirdesh | github.com/tirdesh | Boston, MA
 
-Keep responses concise (2-3 sentences max), friendly, professional, and helpful. Use emojis sparingly.`;
+Keep responses concise (2-3 sentences max), friendly, professional, and helpful. Use emojis sparingly.
+- ONLY state facts that appear in this context. Do NOT invent employers, job titles, publications, dates, metrics, technologies or achievements.
+- If you are asked something this context does not cover, say you would rather not guess and point them to my email or LinkedIn.
+- Do not claim I write for or contribute to any publication other than my own blog at tirdesh.me/blog.`;
 
 // Use backend API route (secure) - falls back to smart responses if backend unavailable
 export const generateAIResponse = async (userMessage: string): Promise<string> => {
