@@ -23,6 +23,10 @@
     {
       "source": "/blog/:path*",
       "destination": "https://tirdesh-blog.vercel.app/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ]
 }

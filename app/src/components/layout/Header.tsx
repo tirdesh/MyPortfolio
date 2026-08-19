@@ -287,7 +287,7 @@ export const Header: React.FC = () => {
                 className="text-foreground hover:text-primary transition-colors relative"
                 onClick={() => setIsOpen(false)}
               >
-                Blog
+                Writing
               </a>
             </nav>
           </SheetContent>
@@ -312,9 +312,9 @@ export const Header: React.FC = () => {
         <a
           href="/blog"
           className="text-foreground hover:text-primary transition-colors relative"
-          aria-label="Read the blog"
+          aria-label="Read my writing"
         >
-          Blog
+          Writing
         </a>
       </nav>
 
