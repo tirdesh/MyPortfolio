@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# The blog is served at /blog via a rewrite in vercel.json. robots.txt is only
+# honoured at the host root, so the sitemap has to be advertised from here
+# rather than from the blog project.
+Sitemap: https://nocodenolife.vercel.app/blog/sitemap-index.xml
