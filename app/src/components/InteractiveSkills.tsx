@@ -1,4 +1,4 @@
-// src/pages/Skills.tsx
+// src/components/InteractiveSkills.tsx
 
 import { skillCategories } from "@/content/SkillList";
 import {
@@ -9,101 +9,39 @@ import {
   Legend,
   Tooltip,
 } from "chart.js";
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Pie } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const BUBBLE_SIZE = 80;
-const BORDER_PADDING = 20;
-
-const getRandomPosition = (width: number, height: number) => ({
-  x:
-    Math.random() * (width - BUBBLE_SIZE - 2 * BORDER_PADDING) + BORDER_PADDING,
-  y:
-    Math.random() * (height - BUBBLE_SIZE - 2 * BORDER_PADDING) +
-    BORDER_PADDING,
-});
-
-const getRandomVelocity = () => ({
-  x: (Math.random() - 0.5) * 10,
-  y: (Math.random() - 0.5) * 10,
-});
-
-const MIN_BUBBLE_SIZE = 60;
+const BORDER_PADDING = 10;
+const MIN_BUBBLE_SIZE = 48;
 const MAX_BUBBLE_SIZE = 120;
+const NARROW_BREAKPOINT = 480;
 
-const SkillCategoryBubble: React.FC<{
-  category: (typeof skillCategories)[0];
-  onClick: () => void;
-  containerSize: { width: number; height: number };
-  maxSkillCount: number;
-}> = ({ category, onClick, containerSize, maxSkillCount }) => {
-  const controls = useAnimation();
+type ContainerSize = { width: number; height: number };
+type BubbleState = { x: number; y: number; vx: number; vy: number; size: number };
 
-  // Calculate bubble size based on skill count
-  const skillCount = category.skills.length;
-  const bubbleSize =
-    MIN_BUBBLE_SIZE +
-    (MAX_BUBBLE_SIZE - MIN_BUBBLE_SIZE) * (skillCount / maxSkillCount);
-
-  const [position, setPosition] = useState(
-    getRandomPosition(containerSize.width, containerSize.height)
+// On a phone the play area is under 300px wide. Sizing bubbles off a fixed
+// 60-120px range leaves them no room to travel, so they collapse into one
+// overlapping column. Cap them against the width they actually have.
+const bubbleSizeFor = (
+  skillCount: number,
+  maxSkillCount: number,
+  containerWidth: number
+) => {
+  const usable = containerWidth - 2 * BORDER_PADDING;
+  const ceiling = Math.min(
+    MAX_BUBBLE_SIZE,
+    Math.max(MIN_BUBBLE_SIZE, usable / 2.6)
   );
-  const [velocity, setVelocity] = useState(getRandomVelocity());
-
-  useEffect(() => {
-    const updatePosition = () => {
-      let newX = position.x + velocity.x;
-      let newY = position.y + velocity.y;
-      let newVelocityX = velocity.x;
-      let newVelocityY = velocity.y;
-
-      if (
-        newX <= BORDER_PADDING ||
-        newX >= containerSize.width - bubbleSize - BORDER_PADDING
-      ) {
-        newVelocityX = -newVelocityX;
-        newX = Math.max(
-          BORDER_PADDING,
-          Math.min(newX, containerSize.width - bubbleSize - BORDER_PADDING)
-        );
-      }
-      if (
-        newY <= BORDER_PADDING ||
-        newY >= containerSize.height - bubbleSize - BORDER_PADDING
-      ) {
-        newVelocityY = -newVelocityY;
-        newY = Math.max(
-          BORDER_PADDING,
-          Math.min(newY, containerSize.height - bubbleSize - BORDER_PADDING)
-        );
-      }
-
-      setPosition({ x: newX, y: newY });
-      setVelocity({ x: newVelocityX, y: newVelocityY });
-      controls.set({ x: newX, y: newY });
-    };
-
-    const interval = setInterval(updatePosition, 50);
-    return () => clearInterval(interval);
-  }, [position, velocity, controls, containerSize, bubbleSize]);
-
-  return (
-    <motion.div
-      className="absolute flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-600 text-white cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all duration-300"
-      style={{ width: bubbleSize, height: bubbleSize }}
-      animate={controls}
-      onClick={onClick}
-      whileHover={{ scale: 1.05 }}
-    >
-      <span className="text-center text-sm">{category.category}</span>
-    </motion.div>
-  );
+  const floor = ceiling * 0.66;
+  const ratio = maxSkillCount > 0 ? skillCount / maxSkillCount : 1;
+  return Math.round(floor + (ceiling - floor) * ratio);
 };
 
-const Skills: React.FC = () => {
+const InteractiveSkills: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<
     (typeof skillCategories)[0] | null
   >(null);
@@ -112,22 +50,215 @@ const Skills: React.FC = () => {
     trivia: string;
     fact: string;
   } | null>(null);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState<ContainerSize>({
+    width: 0,
+    height: 0,
+  });
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const nodeRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const bubblesRef = useRef<BubbleState[]>([]);
+
+  // ResizeObserver rather than a window listener: this panel sits inside an
+  // animated card and a tab that mounts on demand, so its box settles well
+  // after the window has stopped firing resize events.
   useEffect(() => {
-    const updateSize = () => {
-      if (containerRef.current) {
-        setContainerSize({
-          width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight,
-        });
+    const node = containerRef.current;
+    if (!node) return;
+
+    const measure = () =>
+      setContainerSize((prev) =>
+        prev.width === node.offsetWidth && prev.height === node.offsetHeight
+          ? prev
+          : { width: node.offsetWidth, height: node.offsetHeight }
+      );
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const isNarrow = containerSize.width > 0 && containerSize.width < NARROW_BREAKPOINT;
+
+  const maxSkillCount = useMemo(
+    () =>
+      Math.max(...skillCategories.map((category) => category.skills.length)),
+    []
+  );
+
+  const sizes = useMemo(
+    () =>
+      skillCategories.map((category) =>
+        bubbleSizeFor(category.skills.length, maxSkillCount, containerSize.width)
+      ),
+    [containerSize.width, maxSkillCount]
+  );
+
+  // One rAF loop for every bubble, so they can bounce off each other instead
+  // of drifting through each other and hiding their own labels. The previous
+  // version gave each bubble its own 50ms setInterval whose effect depended on
+  // the position it set, which tore the timer down and re-rendered every tick.
+  useEffect(() => {
+    const { width, height } = containerSize;
+    if (width <= 0 || height <= 0 || selectedCategory) return;
+
+    const speed = width < NARROW_BREAKPOINT ? 26 : 42; // px per second
+    const limitFor = (size: number) => ({
+      maxX: Math.max(BORDER_PADDING, width - size - BORDER_PADDING),
+      maxY: Math.max(BORDER_PADDING, height - size - BORDER_PADDING),
+    });
+
+    const clampAll = () => {
+      for (const bubble of bubblesRef.current) {
+        const { maxX, maxY } = limitFor(bubble.size);
+        bubble.x = Math.min(Math.max(bubble.x, BORDER_PADDING), maxX);
+        bubble.y = Math.min(Math.max(bubble.y, BORDER_PADDING), maxY);
       }
     };
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
+
+    const renormalize = (bubble: BubbleState) => {
+      const magnitude = Math.hypot(bubble.vx, bubble.vy) || 1;
+      bubble.vx = (bubble.vx / magnitude) * speed;
+      bubble.vy = (bubble.vy / magnitude) * speed;
+    };
+
+    // Equal-mass elastic response: push the pair apart, and when asked, swap
+    // the velocity components along the collision normal.
+    const resolveCollisions = (withImpulse: boolean) => {
+      const bubbles = bubblesRef.current;
+      for (let i = 0; i < bubbles.length; i++) {
+        for (let j = i + 1; j < bubbles.length; j++) {
+          const a = bubbles[i];
+          const b = bubbles[j];
+          const ra = a.size / 2;
+          const rb = b.size / 2;
+          let dx = b.x + rb - (a.x + ra);
+          let dy = b.y + rb - (a.y + ra);
+          let dist = Math.hypot(dx, dy);
+          if (dist === 0) {
+            dx = 1;
+            dy = 0;
+            dist = 1;
+          }
+          const minDist = ra + rb;
+          if (dist >= minDist) continue;
+
+          const nx = dx / dist;
+          const ny = dy / dist;
+          const shift = (minDist - dist) / 2;
+          a.x -= nx * shift;
+          a.y -= ny * shift;
+          b.x += nx * shift;
+          b.y += ny * shift;
+
+          if (!withImpulse) continue;
+          const va = a.vx * nx + a.vy * ny;
+          const vb = b.vx * nx + b.vy * ny;
+          if (vb - va < 0) {
+            const diff = vb - va;
+            a.vx += diff * nx;
+            a.vy += diff * ny;
+            b.vx -= diff * nx;
+            b.vy -= diff * ny;
+            renormalize(a);
+            renormalize(b);
+          }
+        }
+      }
+    };
+
+    const paint = () => {
+      bubblesRef.current.forEach((bubble, i) => {
+        const node = nodeRefs.current[i];
+        if (node) {
+          node.style.transform = `translate3d(${bubble.x}px, ${bubble.y}px, 0)`;
+        }
+      });
+    };
+
+    // Seed on first run (or when the category count changes), otherwise keep
+    // the bubbles where they are and just re-fit them to the new box.
+    if (bubblesRef.current.length !== sizes.length) {
+      bubblesRef.current = sizes.map((size, i) => {
+        const { maxX, maxY } = limitFor(size);
+        let x = 0;
+        let y = 0;
+        // Rejection-sample a starting spot that does not already overlap.
+        for (let attempt = 0; attempt < 80; attempt++) {
+          x = BORDER_PADDING + Math.random() * Math.max(0, maxX - BORDER_PADDING);
+          y = BORDER_PADDING + Math.random() * Math.max(0, maxY - BORDER_PADDING);
+          const clear = bubblesRef.current.slice(0, i).every((other) => {
+            const dx = x + size / 2 - (other.x + other.size / 2);
+            const dy = y + size / 2 - (other.y + other.size / 2);
+            return Math.hypot(dx, dy) >= (size + other.size) / 2 + 4;
+          });
+          if (clear) break;
+        }
+        const angle = Math.random() * Math.PI * 2;
+        return {
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size,
+        };
+      });
+    } else {
+      bubblesRef.current.forEach((bubble, i) => {
+        bubble.size = sizes[i];
+      });
+    }
+
+    // Settle any residual overlap from seeding, then paint immediately.
+    // rAF never fires in a hidden tab, so waiting for the first frame to write
+    // a transform would leave all six bubbles stacked at the top-left corner.
+    clampAll();
+    for (let pass = 0; pass < 24; pass++) resolveCollisions(false);
+    clampAll();
+    paint();
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frame = 0;
+    let last = performance.now();
+
+    const step = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+
+      for (const bubble of bubblesRef.current) {
+        bubble.x += bubble.vx * dt;
+        bubble.y += bubble.vy * dt;
+
+        const { maxX, maxY } = limitFor(bubble.size);
+        if (bubble.x <= BORDER_PADDING) {
+          bubble.x = BORDER_PADDING;
+          bubble.vx = Math.abs(bubble.vx);
+        } else if (bubble.x >= maxX) {
+          bubble.x = maxX;
+          bubble.vx = -Math.abs(bubble.vx);
+        }
+        if (bubble.y <= BORDER_PADDING) {
+          bubble.y = BORDER_PADDING;
+          bubble.vy = Math.abs(bubble.vy);
+        } else if (bubble.y >= maxY) {
+          bubble.y = maxY;
+          bubble.vy = -Math.abs(bubble.vy);
+        }
+      }
+
+      resolveCollisions(true);
+      resolveCollisions(true);
+      clampAll();
+      paint();
+
+      frame = requestAnimationFrame(step);
+    };
+
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [containerSize, sizes, selectedCategory]);
 
   const pieData = useMemo(
     () => ({
@@ -164,11 +295,15 @@ const Skills: React.FC = () => {
       plugins: {
         legend: {
           display: true,
-          position: "right" as const,
+          // A right-hand legend takes almost the whole width on a phone and
+          // the labels get clipped, so move it under the chart when narrow.
+          position: (isNarrow ? "bottom" : "right") as "bottom" | "right",
           labels: {
             color: "white",
+            boxWidth: isNarrow ? 12 : 20,
+            padding: isNarrow ? 6 : 10,
             font: {
-              size: 14,
+              size: isNarrow ? 11 : 14,
             },
           },
         },
@@ -188,93 +323,107 @@ const Skills: React.FC = () => {
         }
       },
     }),
-    [selectedCategory]
-  );
-
-  const maxSkillCount = useMemo(
-    () =>
-      Math.max(...skillCategories.map((category) => category.skills.length)),
-    []
+    [selectedCategory, isNarrow]
   );
 
   return (
-    <div className="relative flex-grow flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black p-4 md:p-8 min-h-screen">
-      <p className="text-white mb-4">Click on a skill category to learn more</p>
+    <div className="relative flex flex-col items-center bg-gradient-to-br from-gray-900 to-black p-2 sm:p-4 md:p-6 rounded-lg">
+      <p className="text-white text-sm sm:text-base mb-3 text-center">
+        {isNarrow
+          ? "Tap a skill category to learn more"
+          : "Click on a skill category to learn more"}
+      </p>
       <div
         ref={containerRef}
-        className="border-4 border-purple-500 rounded-lg w-full h-[calc(100vh)]"
+        className="relative overflow-hidden border-4 border-purple-500 rounded-lg w-full h-[70vh] min-h-[360px] max-h-[620px]"
       >
         {!selectedCategory &&
+          containerSize.width > 0 &&
           skillCategories.map((category, index) => (
-            <SkillCategoryBubble
-              key={index}
-              category={category}
-              onClick={() => {
-                setSelectedCategory(category);
-                setSelectedSkill(null);
+            // The outer node owns the rAF translate; the button owns the
+            // hover/press scale, so the two never fight over `transform`.
+            <div
+              key={category.category}
+              ref={(el) => {
+                nodeRefs.current[index] = el;
               }}
-              containerSize={containerSize}
-              maxSkillCount={maxSkillCount}
-            />
+              className="absolute left-0 top-0 will-change-transform"
+              style={{ width: sizes[index], height: sizes[index] }}
+            >
+              <button
+                type="button"
+                aria-label={`Show ${category.category} skills`}
+                onClick={() => {
+                  setSelectedCategory(category);
+                  setSelectedSkill(null);
+                }}
+                className="w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-600 text-white cursor-pointer hover:from-purple-600 hover:to-purple-700 hover:scale-105 active:scale-95 transition-transform duration-200 shadow-lg px-1.5"
+              >
+                <span className="text-center text-xs sm:text-sm leading-tight break-words">
+                  {category.category}
+                </span>
+              </button>
+            </div>
           ))}
+
         <AnimatePresence>
           {selectedCategory && (
             <motion.div
-              initial={{ opacity: 0, scale: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 flex items-center justify-center"
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 flex flex-col p-3 sm:p-5"
             >
-              <div className="relative w-full h-full max-w-3xl max-h-3xl p-8">
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="relative w-full h-full">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-[80%] h-[80%] relative">
-                        <div className="absolute top-3 left-0 right-12 text-white text-center font-semibold py-2 rounded-md shadow-lg">
-                          Click on a skill slice to learn more
-                        </div>
-                        <Pie data={pieData} options={pieOptions} />
-                        <button
-                          className="absolute top-2 right-2 text-white z-10 bg-red-500 rounded-full w-8 h-8 flex items-center justify-center"
-                          onClick={() => {
-                            setSelectedCategory(null);
-                            setSelectedSkill(null);
-                          }}
-                        >
-                          X
-                        </button>
-                        {selectedSkill && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="absolute inset-0 flex items-center justify-center"
-                          >
-                            <div className="relative bg-gray-800 rounded-full w-[45%] h-[45%] flex items-center justify-center p-4 border-2 border-purple-400">
-                              <button
-                                className="absolute top-1 right-1 text-white z-10 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-xs"
-                                onClick={() => setSelectedSkill(null)}
-                              >
-                                X
-                              </button>
-                              <div className="text-center">
-                                <h3 className="text-lg font-bold text-white mb-2">
-                                  {selectedSkill.name}
-                                </h3>
-                                <p className="text-sm text-gray-300 mb-2">
-                                  {selectedSkill.trivia}
-                                </p>
-                                <p className="text-xs text-gray-400 italic">
-                                  {selectedSkill.fact}
-                                </p>
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </div>
+              <div className="flex items-start justify-between gap-2 mb-2 shrink-0">
+                <p className="text-white text-sm sm:text-base font-semibold">
+                  {isNarrow
+                    ? "Tap a slice to learn more"
+                    : "Click on a skill slice to learn more"}
+                </p>
+                <button
+                  type="button"
+                  aria-label="Close category"
+                  className="shrink-0 text-white bg-red-500 hover:bg-red-600 rounded-full w-8 h-8 flex items-center justify-center"
+                  onClick={() => {
+                    setSelectedCategory(null);
+                    setSelectedSkill(null);
+                  }}
+                >
+                  X
+                </button>
+              </div>
+
+              <div className="relative flex-1 min-h-0 w-full">
+                <Pie data={pieData} options={pieOptions} />
+
+                {selectedSkill && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute inset-0 flex items-center justify-center p-2"
+                  >
+                    <div className="relative bg-gray-800/95 backdrop-blur-sm rounded-2xl border-2 border-purple-400 w-full max-w-xs max-h-full overflow-y-auto p-4 pt-7 text-center shadow-xl">
+                      <button
+                        type="button"
+                        aria-label="Close skill"
+                        className="absolute top-1.5 right-1.5 text-white z-10 bg-red-500 hover:bg-red-600 rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                        onClick={() => setSelectedSkill(null)}
+                      >
+                        X
+                      </button>
+                      <h3 className="text-base sm:text-lg font-bold text-white mb-2">
+                        {selectedSkill.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-300 mb-2">
+                        {selectedSkill.trivia}
+                      </p>
+                      <p className="text-[11px] sm:text-xs text-gray-400 italic">
+                        {selectedSkill.fact}
+                      </p>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           )}
@@ -284,4 +433,4 @@ const Skills: React.FC = () => {
   );
 };
 
-export default Skills;
+export default InteractiveSkills;

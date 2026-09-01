@@ -20,7 +20,7 @@ const Skills: React.FC = () => {
         My Tech Arsenal
       </motion.h1>
       <Card className="bg-white dark:bg-gray-800 shadow-lg">
-        <CardContent className="p-8">
+        <CardContent className="p-4 sm:p-6 md:p-8">
           <Tabs defaultValue="informative" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-200 dark:bg-gray-700">
               <TabsTrigger
