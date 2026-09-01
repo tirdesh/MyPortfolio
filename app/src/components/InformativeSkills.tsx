@@ -39,7 +39,7 @@ const SkillCategory: React.FC<{ category: (typeof skillCategories)[0] }> = ({
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {skill.trivia}
                 </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 italic">
+                <p className="text-[13px] text-gray-600 dark:text-gray-300 mt-1 italic">
                   {skill.fact}
                 </p>
               </motion.li>

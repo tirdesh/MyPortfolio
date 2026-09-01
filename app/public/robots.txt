@@ -5,3 +5,4 @@ Allow: /
 # honoured at the host root, so the sitemap has to be advertised from here
 # rather than from the blog project.
 Sitemap: https://tirdesh.me/blog/sitemap-index.xml
+Sitemap: https://tirdesh.me/sitemap.xml

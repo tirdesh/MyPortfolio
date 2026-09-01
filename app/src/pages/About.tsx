@@ -15,7 +15,12 @@ const aboutItems = [
   { title: "Experience", items: experience },
 ];
 
-const AboutMe: React.FC = () => {
+// Rendered standalone on its own route (h1), and inlined as a section on the
+// home page (h2), so the page keeps exactly one top-level heading.
+export type SectionHeading = { as?: "h1" | "h2" };
+
+const AboutMe: React.FC<SectionHeading> = ({ as = "h1" }) => {
+  const Heading = motion[as];
   const [revealedItems, setRevealedItems] = useState<number[]>([]);
   const [showMemoryGame, setShowMemoryGame] = useState(false);
   const [showQuizGame, setShowQuizGame] = useState(false);
@@ -39,14 +44,14 @@ const AboutMe: React.FC = () => {
 
   return (
     <PageContainer maxWidth="7xl">
-      <motion.h1
+      <Heading
         className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
         Discover More About Me
-      </motion.h1>
+      </Heading>
       <div className="flex flex-wrap justify-center gap-4 mb-8">
         <Button
           onClick={() => setShowMemoryGame(true)}

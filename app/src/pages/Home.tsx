@@ -2,15 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import React, { useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import ProfilePic from "../assets/ProfilePicc.png";
 import { generateAIResponse } from "../utils/aiTerminal";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
-import About from "./About";
-import Projects from "./Projects";
-import Skills from "./Skills";
-import Contact from "./Contact";
+const About = lazy(() => import("./About"));
+const Projects = lazy(() => import("./Projects"));
+const Skills = lazy(() => import("./Skills"));
+const Contact = lazy(() => import("./Contact"));
 
 const LandingPage: React.FC = () => {
   const [input, setInput] = useState("");
@@ -23,7 +23,6 @@ const LandingPage: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const smallScreenChatRef = useRef<HTMLDivElement>(null);
 
   // Funky rotating placeholders
@@ -51,11 +50,42 @@ const LandingPage: React.FC = () => {
     "$ what's your favorite language?",
   ];
 
+  // Scroll the chat panes themselves, never the document. scrollIntoView()
+  // walks every scrollable ancestor including the page, so appending a message
+  // used to yank the whole page toward the terminal, once on submit and again
+  // on the reply.
+  useEffect(() => {
+    let done = false;
+    const prefetch = () => {
+      if (done) return;
+      done = true;
+      void import("./About");
+      void import("./Projects");
+      void import("./Skills");
+      void import("./Contact");
+    };
+    const frame = requestAnimationFrame(prefetch);
+    const timer = window.setTimeout(prefetch, 1200);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+  }, []);
+
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    if (smallScreenChatRef.current) {
-      smallScreenChatRef.current.scrollTop =
-        smallScreenChatRef.current.scrollHeight;
+    // Radix ScrollArea keeps the overflow on an inner viewport node, not on the
+    // root the ref points at. That viewport also ignores
+    // scrollTo({ behavior: "smooth" }) outright, so assign scrollTop directly.
+    const viewport = scrollAreaRef.current?.querySelector<HTMLElement>(
+      "[data-radix-scroll-area-viewport]"
+    );
+    if (viewport) {
+      viewport.scrollTop = viewport.scrollHeight;
+    }
+
+    const mobilePane = smallScreenChatRef.current;
+    if (mobilePane) {
+      mobilePane.scrollTop = mobilePane.scrollHeight;
     }
   };
 
@@ -321,7 +351,6 @@ const LandingPage: React.FC = () => {
                         </div>
                       )}
                     </pre>
-                    <div ref={messagesEndRef} />
                   </ScrollArea>
                   <form onSubmit={handleSubmit} className="mt-4 flex">
                     <div className="flex-grow mr-2 relative">
@@ -363,7 +392,9 @@ const LandingPage: React.FC = () => {
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.5 }}
       >
-        <About />
+        <Suspense fallback={<span className="block min-h-[40vh]" />}>
+          <About as="h2" />
+        </Suspense>
       </motion.section>
 
       {/* Projects Section */}
@@ -375,7 +406,9 @@ const LandingPage: React.FC = () => {
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.5 }}
       >
-        <Projects />
+        <Suspense fallback={<span className="block min-h-[40vh]" />}>
+          <Projects as="h2" />
+        </Suspense>
       </motion.section>
 
       {/* Skills Section */}
@@ -387,7 +420,9 @@ const LandingPage: React.FC = () => {
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.5 }}
       >
-        <Skills />
+        <Suspense fallback={<span className="block min-h-[40vh]" />}>
+          <Skills as="h2" />
+        </Suspense>
       </motion.section>
 
       {/* Contact Section */}
@@ -399,7 +434,9 @@ const LandingPage: React.FC = () => {
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.5 }}
       >
-        <Contact />
+        <Suspense fallback={<span className="block min-h-[40vh]" />}>
+          <Contact as="h2" />
+        </Suspense>
       </motion.section>
     </div>
   );

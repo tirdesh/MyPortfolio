@@ -6,7 +6,12 @@ import { motion } from "framer-motion";
 import React, { useState } from "react";
 import PageContainer from "@/components/layout/PageContainer";
 
-const Contact: React.FC = () => {
+// Rendered standalone on its own route (h1), and inlined as a section on the
+// home page (h2), so the page keeps exactly one top-level heading.
+export type SectionHeading = { as?: "h1" | "h2" };
+
+const Contact: React.FC<SectionHeading> = ({ as = "h1" }) => {
+  const Heading = as;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -59,9 +64,9 @@ const Contact: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+              <Heading className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-4">
                 Let's Connect!
-              </h1>
+              </Heading>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 Have a project in mind or want to collaborate? I'd love to hear from you.
               </p>

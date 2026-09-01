@@ -37,7 +37,12 @@ import PageContainer from "@/components/layout/PageContainer";
 
 const ITEMS_PER_PAGE = 6;
 
-const Projects: React.FC = () => {
+// Rendered standalone on its own route (h1), and inlined as a section on the
+// home page (h2), so the page keeps exactly one top-level heading.
+export type SectionHeading = { as?: "h1" | "h2" };
+
+const Projects: React.FC<SectionHeading> = ({ as = "h1" }) => {
+  const Heading = as;
   const [filter, setFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -106,9 +111,9 @@ const Projects: React.FC = () => {
 
   return (
     <PageContainer maxWidth="7xl">
-      <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
+      <Heading className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
           My Projects
-        </h1>
+        </Heading>
 
         <div className="mb-8 flex flex-col gap-4">
           <div className="relative w-full">
