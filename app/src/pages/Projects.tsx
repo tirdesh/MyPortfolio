@@ -134,7 +134,7 @@ const Projects: React.FC<SectionHeading> = ({ as = "h1" }) => {
               setFilter(value);
               setCurrentPage(1);
             }}
-            defaultValue="All"
+            value={filter}
           >
             <SelectTrigger className="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white">
               <SelectValue placeholder="Filter by technology" />
@@ -229,6 +229,45 @@ const Projects: React.FC<SectionHeading> = ({ as = "h1" }) => {
             ))}
           </motion.div>
         </AnimatePresence>
+
+        {filteredProjects.length === 0 && (
+          <div className="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-12 text-center">
+            <p className="text-lg font-semibold text-gray-800 dark:text-white">
+              No projects match
+              {searchTerm ? ` "${searchTerm}"` : ""}
+              {filter !== "All" ? ` in ${filter}` : ""}.
+            </p>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              Try a different term, or jump straight to a technology.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {uniqueTechnologies.slice(0, 8).map((tech) => (
+                <button
+                  key={tech}
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setFilter(tech);
+                    setCurrentPage(1);
+                  }}
+                  className="rounded-md border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  {tech}
+                </button>
+              ))}
+            </div>
+            <Button
+              onClick={() => {
+                setSearchTerm("");
+                setFilter("All");
+                setCurrentPage(1);
+              }}
+              className="mt-6 bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+            >
+              Show all projects
+            </Button>
+          </div>
+        )}
 
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center items-center space-x-4">
