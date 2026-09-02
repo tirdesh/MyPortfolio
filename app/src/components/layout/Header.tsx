@@ -154,6 +154,27 @@ export const Header: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
+  // A nav click can animate the page through several thousand pixels, so honour
+  // a reduced-motion preference and jump instead.
+  const scrollBehavior = (): ScrollBehavior =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth";
+
+  // offsetTop is measured from the nearest positioned ancestor rather than the
+  // document, which under-reported the section by 20px, and the offset was a
+  // hardcoded 60 against a header that actually measures 65. Sections landed
+  // about 20px lower than intended. Measure both for real.
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (!section) return false;
+    const headerHeight =
+      document.querySelector("header")?.getBoundingClientRect().height ?? 64;
+    const top = section.getBoundingClientRect().top + window.scrollY - headerHeight;
+    window.scrollTo({ top: Math.max(top, 0), behavior: scrollBehavior() });
+    return true;
+  };
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, sectionId?: string) => {
     e.preventDefault();
     
@@ -166,14 +187,14 @@ export const Header: React.FC = () => {
       if (location.pathname !== "/") {
         navigate("/");
         setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.scrollTo({ top: 0, behavior: scrollBehavior() });
           // Re-enable observer after scroll completes
           setTimeout(() => {
             isManualNavigation.current = false;
           }, 1000);
         }, 100);
       } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: scrollBehavior() });
         setTimeout(() => {
           isManualNavigation.current = false;
         }, 1000);
@@ -182,11 +203,7 @@ export const Header: React.FC = () => {
     } else if (location.pathname === "/" && sectionId) {
       // On home page, scroll to section with offset for header
       setActiveSection(sectionId); // Immediately update active section
-      const section = document.getElementById(sectionId);
-      if (section) {
-        const headerHeight = 60; // Reduced header height
-        const sectionTop = section.offsetTop - headerHeight;
-        window.scrollTo({ top: sectionTop, behavior: "smooth" });
+      if (scrollToSection(sectionId)) {
         // Re-enable observer after scroll completes
         setTimeout(() => {
           isManualNavigation.current = false;
@@ -200,11 +217,7 @@ export const Header: React.FC = () => {
         // Set active section after navigation completes
         setTimeout(() => {
           setActiveSection(sectionId);
-          const section = document.getElementById(sectionId);
-          if (section) {
-            const headerHeight = 60; // Reduced header height
-            const sectionTop = section.offsetTop - headerHeight;
-            window.scrollTo({ top: sectionTop, behavior: "smooth" });
+          if (scrollToSection(sectionId)) {
             // Re-enable observer after scroll completes
             setTimeout(() => {
               isManualNavigation.current = false;
