@@ -4,6 +4,17 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.tirdesh.fyi"
+        }
+      ],
+      "destination": "https://tirdesh.fyi/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
@@ -12,6 +23,17 @@
         }
       ],
       "destination": "https://tirdesh.fyi/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "nocodenolife.vercel.app"
+        }
+      ],
+      "destination": "https://tirdesh.fyi/",
       "permanent": true
     },
     {
