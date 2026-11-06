@@ -4,24 +4,26 @@
   "redirects": [
     {
       "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.tirdesh.me"
-        }
-      ],
-      "destination": "https://tirdesh.me/:path*",
+      "has": [{ "type": "host", "value": "www.tirdesh.fyi" }],
+      "destination": "https://tirdesh.fyi/:path*",
       "permanent": true
     },
     {
       "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "nocodenolife.vercel.app"
-        }
-      ],
-      "destination": "https://tirdesh.me/:path*",
+      "has": [{ "type": "host", "value": "tirdesh.me" }],
+      "destination": "https://tirdesh.fyi/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.tirdesh.me" }],
+      "destination": "https://tirdesh.fyi/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "nocodenolife.vercel.app" }],
+      "destination": "https://tirdesh.fyi/:path*",
       "permanent": true
     }
   ],

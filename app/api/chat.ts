@@ -82,8 +82,8 @@ function cleanReply(text: string): string {
 // ---------------------------------------------------------------------------
 
 const ALLOWED_ORIGINS = new Set([
-  'https://tirdesh.me',
-  'https://www.tirdesh.me',
+  'https://tirdesh.fyi',
+  'https://www.tirdesh.fyi',
   'http://localhost:5173',
   'http://localhost:4173',
   'http://localhost:4321',

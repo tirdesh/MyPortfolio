@@ -63,7 +63,7 @@ const applyRouteMeta = (pathname: string) => {
   // path is that page.
   const canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) {
-    canonical.setAttribute("href", `https://tirdesh.me${pathname}`);
+    canonical.setAttribute("href", `https://tirdesh.fyi${pathname}`);
   }
 };
 

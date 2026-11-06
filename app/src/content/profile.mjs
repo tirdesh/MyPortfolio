@@ -23,7 +23,7 @@ export const identity = {
   phone: "+1 (857) 316-7532",
   linkedin: "linkedin.com/in/tirdesh",
   github: "github.com/tirdesh",
-  blog: "tirdesh.me/blog",
+  blog: "tirdesh.fyi/blog",
   yearsExperience: "4+",
 };
 
