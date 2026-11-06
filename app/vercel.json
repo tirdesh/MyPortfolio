@@ -1,28 +1,49 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "trailingSlash": false,
   "redirects": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.tirdesh.fyi" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.tirdesh.fyi"
+        }
+      ],
       "destination": "https://tirdesh.fyi/:path*",
       "permanent": true
     },
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "tirdesh.me" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "tirdesh.me"
+        }
+      ],
       "destination": "https://tirdesh.fyi/:path*",
       "permanent": true
     },
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.tirdesh.me" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.tirdesh.me"
+        }
+      ],
       "destination": "https://tirdesh.fyi/:path*",
       "permanent": true
     },
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "nocodenolife.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "nocodenolife.vercel.app"
+        }
+      ],
       "destination": "https://tirdesh.fyi/:path*",
       "permanent": true
     }
